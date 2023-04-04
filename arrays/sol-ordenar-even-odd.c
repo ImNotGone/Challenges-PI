@@ -28,7 +28,7 @@ int main() {
 
     int i = 0;
     int expected_even = 2;
-    for (int i = 0; i < expected_even; i++) {
+    for (; i < expected_even; i++) {
         assert(res[i] % 2 == 0);
     }
 
