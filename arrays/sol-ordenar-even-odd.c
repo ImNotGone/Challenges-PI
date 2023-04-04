@@ -17,7 +17,7 @@
 // @param nums: array de numeros a ordenar
 // @param dim: dimension del array
 // @param res: array de salida
-void order_even_uneven(int nums[], int dim, int res[]);
+void order_even_uneven(const int nums[], int dim, int res[]);
 
 int main() {
     int nums[] = {3, 1, 2, 4};
@@ -43,7 +43,7 @@ int main() {
 // @param nums: array de numeros a ordenar
 // @param dim: dimension del array
 // @param res: array de salida
-void order_even_uneven(int nums[], int dim, int res[]) {
+void order_even_uneven(const int nums[], int dim, int res[]) {
     for(int i = 0, evenIdx = 0, oddIdx = dim; i < dim; ++i) {
         res[nums[i] % 2 == 1? --oddIdx : evenIdx++] = nums[i]; // nums[i] & 1 sería otra opcion
     }
