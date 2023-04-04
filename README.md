@@ -1,1 +1,1 @@
-Ejercicios extra clase de consulta martes
+Challenges clase de consulta PI
