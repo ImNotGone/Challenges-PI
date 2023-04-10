@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <assert.h>
 /*
 Dado un array de enteros, escribir una funcion smallest_missing_int()
 para encontrar el entero más pequeño que no está en el array (a partir de 0 exclusive).
@@ -68,10 +68,10 @@ unsigned int smallest_missing_int(int *array, unsigned int length)
   {
     return 1;
   }
-  
+
   for (unsigned int i = 0; i < newDim - 1; i++)
   {
-    // en cuanto la diferencia entre dos elementos consecutivos sea mayor a 1, 
+    // en cuanto la diferencia entre dos elementos consecutivos sea mayor a 1,
     // el menor entero que no esta en el array es el siguiente al primero
     if (array[i + 1] - array[i] > 1)
     {
@@ -85,8 +85,54 @@ unsigned int smallest_missing_int(int *array, unsigned int length)
 
 int main(void)
 {
-  int array[] = {9,8,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6,-7,-8,-9};
-  unsigned int length = sizeof(array) / sizeof(array[0]);
-  printf("smallest_missing_int(array, %d) = %d\n", length, smallest_missing_int(array, length));
+  int array0[] = {9,8,6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6,-7,-8,-9}; // devuelve 7
+  int * array = array0;
+  unsigned int length = 18;
+  unsigned int expected = 7;
+  unsigned int actual = smallest_missing_int(array, length);
+
+  assert(actual == expected);
+
+  int array1[] = {0,1,2,3,4,5,6,7,8,9}; // devuelve 10
+  array = array1;
+  length = 10;
+  expected = 10;
+  actual = smallest_missing_int(array, length);
+  assert(actual == expected);
+
+
+  int array2[] = {1,9,3,-2,0,5,8,-6,7,4}; // devuelve 2
+  array = array2;
+  length = 10;
+  expected = 2;
+  actual = smallest_missing_int(array, length);
+  assert(actual == expected);
+
+
+  int array3[] = {0, -1, -2, -3, -1, 1, 1, 0, 39, 20, 11, 3, 4, 4, 5, 6, 2}; // devuelve 7
+  array = array3;
+  length = 17;
+  expected = 7;
+  actual = smallest_missing_int(array, length);
+  assert(actual == expected);
+
+
+  int array4[] = {-1, -3, -2, -3, 0, 3, 4}; // devuelve 1
+  array = array4;
+  length = 7;
+  expected = 1;
+  actual = smallest_missing_int(array, length);
+  assert(actual == expected);
+
+
+  int array5[] = {-3, -2, -2, -1}; // devuelve 1
+  array = array5;
+  length = 4;
+  expected = 1;
+  actual = smallest_missing_int(array, length);
+  assert(actual == expected);
+
+  puts("OK!");
+  // printf("smallest_missing_int(array, %d) = %d\n", length, smallest_missing_int(array, length));
   return 0;
 }
