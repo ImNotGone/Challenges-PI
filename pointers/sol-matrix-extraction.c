@@ -87,7 +87,33 @@ int main(void)
   return 0;
 }
 
+// @brief asigna "value" en la posicion "count" de la matriz, luego incrementa count
+// @param matrix la matriz en la que se quiere insertar value
+// @param count la posicion actual a llenar, luego de insertar se incrementa la variable
+// @param value el valor a insertar
+// @return void
+static void assignAndIncrement(char matrix[ROWS][COLS], unsigned int *count, char value)
+{
+  matrix[*count / COLS][*count % COLS] = value;
+  (*count)++;
+}
+
 void extract(const char char_matrix[ROWS][COLS], char digit_matrix[ROWS][COLS], char letter_matrix[ROWS][COLS], unsigned int *digit_count, unsigned int *letter_count)
 {
-    return;
+  *digit_count = 0;
+  *letter_count = 0;
+  for (int i = 0; i < ROWS; i++)
+  {
+    for (int j = 0; j < COLS; j++)
+    {
+      if (isdigit(char_matrix[i][j]))
+      {
+        assignAndIncrement(digit_matrix, digit_count, char_matrix[i][j]);
+      }
+      else if (isalpha(char_matrix[i][j]))
+      {
+        assignAndIncrement(letter_matrix, letter_count, char_matrix[i][j]);
+      }
+    }
+  }
 }
