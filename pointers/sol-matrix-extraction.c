@@ -104,7 +104,7 @@ void extract(const char char_matrix[ROWS][COLS], char digit_matrix[ROWS][COLS], 
   *letter_count = 0;
   for (int i = 0; i < ROWS; i++)
   {
-    for (int j = 0; j < COLS; j++)
+    for (int j = 0; j < COLS; j++) // se podría eliminar el segundo for y reemplazar el primero por for (int i = 0; i < ROWS * COLS; i++) y acceder a char_matrix[i][j] como char_matrix[i / COLS][i % COLS] (convendria guardarnos los indices en variables para no re-calcularlos por cada acceso)
     {
       if (isdigit(char_matrix[i][j]))
       {
