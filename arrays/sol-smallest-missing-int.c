@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <assert.h>
-
 /*
 Dado un array de enteros, escribir una funcion smallest_missing_int()
 para encontrar el entero más pequeño que no está en el array (a partir de 0 exclusive).
@@ -89,8 +88,70 @@ int main(void)
   return 0;
 }
 
-unsigned int smallest_missing_int(int *array, unsigned int length)
+// @brief ordena el array de menor a mayor
+// @param array array de enteros a ordenar
+// @param length cantidad de elementos del array
+// @return void
+static void bubble_sort(int *array, unsigned int length)
 {
-    return 0;
+  for (unsigned int i = 0, temp; i < length; i++)
+  {
+    for (unsigned int j = 0; j < length - 1; j++)
+    {
+      if (array[j] > array[j + 1])
+      {
+        temp = array[j];
+        array[j] = array[j + 1];
+        array[j + 1] = temp;
+      }
+    }
+  }
 }
 
+// @brief elimina los elementos negativos y el 0 del array
+// @param array array de enteros para limpiar
+// @param length cantidad de elementos del array
+// @return la nueva dimension del array
+static unsigned int remove_negatives(int *array, unsigned int length)
+{
+  unsigned int new_dim = 0;
+  for(unsigned int i = 0; i < length; i++)
+  {
+    if(array[i] > 0)
+    {
+      array[new_dim++] = array[i];
+    }
+  }
+
+  return new_dim;
+}
+
+unsigned int smallest_missing_int(int *array, unsigned int length)
+{
+  unsigned int new_dim = remove_negatives(array, length);
+  // si no hay elementos positivos, el menor entero que no esta en el array es 1
+  if (!new_dim)
+  {
+    return 1;
+  }
+
+  bubble_sort(array, new_dim);
+  // si el primer elemento es mayor que 1, el menor entero que no esta en el array es 1
+  if (array[0] != 1)
+  {
+    return 1;
+  }
+
+  for (unsigned int i = 0; i < new_dim - 1; i++)
+  {
+    // en cuanto la diferencia entre dos elementos consecutivos sea mayor a 1,
+    // el menor entero que no esta en el array es el siguiente al primero
+    if (array[i + 1] - array[i] > 1)
+    {
+      return array[i] + 1;
+    }
+  }
+
+  // si todos los elementos son consecutivos, el menor entero que no esta en el array es el siguiente al ultimo
+  return array[new_dim - 1] + 1;
+}
