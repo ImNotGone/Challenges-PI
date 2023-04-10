@@ -10,7 +10,7 @@ Cada challenge tiene un nombre `<challenge-name>` y se divide en 2 archivos:
 
 ## Temas
 
-- [Arrays](./Arrays)
+- [Arrays](./arrays)
 
 ## Dudas
 
