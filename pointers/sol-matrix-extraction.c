@@ -94,7 +94,7 @@ int main(void)
 // @return void
 static void assignAndIncrement(char matrix[ROWS][COLS], unsigned int *count, char value)
 {
-  matrix[*count / COLS][*count % COLS] = value;
+  matrix[*count / COLS][*count % COLS] = value; // una alternativa evitando calculos seria matrix[0][*count] = value; o directamente matrix[0][(*count)++] = value;
   (*count)++;
 }
 
