@@ -126,6 +126,7 @@ static unsigned int remove_negatives(int *array, unsigned int length)
   return new_dim;
 }
 
+// solcion O(n^2) temporal O(1) espacial
 unsigned int smallest_missing_int(int *array, unsigned int length)
 {
   unsigned int new_dim = remove_negatives(array, length);
@@ -154,4 +155,24 @@ unsigned int smallest_missing_int(int *array, unsigned int length)
 
   // si todos los elementos son consecutivos, el menor entero que no esta en el array es el siguiente al ultimo
   return array[new_dim - 1] + 1;
+}
+
+// solucion O(n) temporal O(n) espacial
+unsigned int smallest_missing_int_On(int *array, unsigned int length)
+{
+    char seen_ints[length];
+    for(int i = 0; i < length; i++) {
+        seen_ints[i] = 0;
+    }
+    for(int i = 0; i < length; i++) {
+        if(array[i] > 0 && array[i] < length) {
+            seen_ints[array[i]]++;
+        }
+    }
+    for(int i = 1; i < length; i++) {
+        if(seen_ints[i] == 0) {
+            return i;
+        }
+    }
+    return length;
 }
