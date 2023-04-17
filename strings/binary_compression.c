@@ -8,7 +8,8 @@ comprimir cada numero binario (inicio y fin). En caso de no encontrar numeros bi
 Consideraciones:
 - Modularizar el codigo.
 - No usar funciones de la biblioteca standard ni de math.h.
-- Se garantiza que ningun numero decimal tiene 0s o 1s, sino solo digitos del 2 al 9, el resto es binario.
+- Se garantiza que ningun numero decimal tiene 0s o 1s, sino solo digitos del 2 al 9, el resto son binarios (no se
+  reciben numeros como 12301, 301, 12).
 - Utilizar el tipo de dato apropiado (ej: unsigned int o size_t para variables que representan valores positivos)
 
 [OPCIONAL] Consideraciones extra:
@@ -34,6 +35,10 @@ Ejemplos:
 - Input: s = "1111 por 10001 es equivalente a 11111111, lo cual es 255"
   Output: 1, s = "15 por 17 es equivalente a 255, lo cual es 255"
              pos: [[0, 3]]
+
+- Input: s = "puedo tener 00000, o 000, o 00 que todo se convierte en 0"
+  Output: 4, s = "puedo tener 0, o 0, o 0 que todo se convierte en 0"
+             pos: [[12, 12][17, 17][22, 22][49, 49]]
 */
 
 #include <stdio.h>
@@ -61,7 +66,7 @@ static unsigned int binary_to_decimal(const char *s, unsigned int start, unsigne
 
 static unsigned int decimal_length(unsigned int decimal)
 {
-    unsigned int length = 0;
+    unsigned int length = decimal == 0 ? 1 : 0; // si decimal es 0, su longitud es 1 (no ingresa al ciclo while)
     while (decimal)
     {
         decimal /= 10;
@@ -140,7 +145,8 @@ int main()
     // char s[] = "esto es un 1010";
     // char s[] = "este string no tiene numeros binarios";
     // char s[] = "001";
-    char s[] = "1111 por 10001 es equivalente a 11111111, lo cual es 255";
+    // char s[] = "1111 por 10001 es equivalente a 11111111, lo cual es 255";
+    char s[] = "puedo tener 00000, o 000, o 00 que todo se convierte en 0";
     unsigned int pos[64][2];
     unsigned int count = binary_compression(s, pos);
     printf("count: %d\ns: %s\npos: [", count, s);
