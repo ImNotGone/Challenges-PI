@@ -13,7 +13,7 @@ Consideraciones:
 - No es necesario que el array de salida M este ordenado.
 - No usar funciones de la biblioteca standard (ctype, etc).
 - Las palabras pueden tener caracteres que no necesariamente son letras.
-- Utilizar la menor cantidad de for's posibles ()
+- La unica variable que NO tiene basura es la matriz de palabras y su cantidad de filas.
 
 [OPCIONAL] Consideraciones extra:
 - Definir una constante (NO magic number) para indicar la cantidad de filas de la matriz M.
@@ -22,15 +22,15 @@ Consideraciones:
 Ejemplo:
 - Input: ["Hola", "Mundo", "Hola", "Mundo"]
   Output: M = [[a, 2][b, 0][c, 0][d, 2][e, 0][f, 0][g, 0][h, 0][i, 0][j, 0][k, 0][l, 2][m, 0][n, 2][o, 4][p, 0][q, 0][r, 0][s, 0][t, 0][u, 2][v, 0][w, 0][x, 0][y, 0][z, 0][A, 0][B, 0][C, 0][D, 0][E, 0][F, 0][G, 0][H, 2][I, 0][J, 0][K, 0][L, 0][M, 2][N, 0][O, 0][P, 0][Q, 0][R, 0][S, 0][T, 0][U, 0][V, 0][W, 0][X, 0][Y, 0][Z, 0]],
-          max_upper = 'M', max_lower = 'o'
+          max_upper = 'M', max_lower = 'o' (esto sucede porque la 'M' es la mayuscula que mas apariciones tiene, y la 'o' es la minuscula que mas apariciones tiene)
 
 - Input: ["hola", "esto", "es", "un", "ejemplo"]
   Output: M = [[a, 1][b, 0][c, 0][d, 0][e, 4][f, 0][g, 0][h, 1][i, 0][j, 1][k, 0][l, 2][m, 1][n, 1][o, 3][p, 1][q, 0][r, 0][s, 2][t, 1][u, 1][v, 0][w, 0][x, 0][y, 0][z, 0][A, 0][B, 0][C, 0][D, 0][E, 0][F, 0][G, 0][H, 0][I, 0][J, 0][K, 0][L, 0][M, 0][N, 0][O, 0][P, 0][Q, 0][R, 0][S, 0][T, 0][U, 0][V, 0][W, 0][X, 0][Y, 0][Z, 0]]
-          max_upper = ' ', max_lower = 'e'
+          max_upper = ' ', max_lower = 'e' (esto sucede porque la 'e' es la minuscula que mas apariciones tiene, y no hay mayusculas)
 
 - Input: ["hola!!!", "qu3", "bu4n05", "l45", "ch4113ng35"]
   Output: M = [[a, 1][b, 1][c, 1][d, 0][e, 0][f, 0][g, 1][h, 2][i, 0][j, 0][k, 0][l, 2][m, 0][n, 2][o, 1][p, 0][q, 1][r, 0][s, 0][t, 0][u, 2][v, 0][w, 0][x, 0][y, 0][z, 0][A, 0][B, 0][C, 0][D, 0][E, 0][F, 0][G, 0][H, 0][I, 0][J, 0][K, 0][L, 0][M, 0][N, 0][O, 0][P, 0][Q, 0][R, 0][S, 0][T, 0][U, 0][V, 0][W, 0][X, 0][Y, 0][Z, 0]]
-          max_upper = ' ', max_lower = 'u'
+          max_upper = ' ', max_lower = 'u' (esto sucede porque la 'u' es la minuscula que mas apariciones tiene, y no hay mayusculas)
 */
 
 #include <stdio.h>
