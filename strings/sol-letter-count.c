@@ -28,10 +28,11 @@ Ejemplo:
 
 - Input: ["hola!!!", "qu3", "bu4n05", "l45", "ch4113ng35"]
   Output: M = [[a, 1][b, 1][c, 1][d, 0][e, 0][f, 0][g, 1][h, 2][i, 0][j, 0][k, 0][l, 2][m, 0][n, 2][o, 1][p, 0][q, 1][r, 0][s, 0][t, 0][u, 2][v, 0][w, 0][x, 0][y, 0][z, 0][A, 0][B, 0][C, 0][D, 0][E, 0][F, 0][G, 0][H, 0][I, 0][J, 0][K, 0][L, 0][M, 0][N, 0][O, 0][P, 0][Q, 0][R, 0][S, 0][T, 0][U, 0][V, 0][W, 0][X, 0][Y, 0][Z, 0]]
-          max_upper = ' ', max_lower = 'o'
+          max_upper = ' ', max_lower = 'u'
 */
 
 #include <stdio.h>
+#include <assert.h>
 
 #define N 10
 
@@ -47,12 +48,22 @@ static void print_matrix(char M[TOTAL_LETTERS][2]);
 int main()
 {
     char words[][N] = {"hola!!!", "qu3", "bu4n05", "l45", "ch4113ng35"};
-    char M[54][2];
+    char mat[TOTAL_LETTERS][2];
     char max_upper, max_lower;
     unsigned int word_count = sizeof(words) / sizeof(words[0]);
-    letter_count(words, word_count, M, &max_upper, &max_lower);
-    print_matrix(M);
-    printf("max_upper = %c, max_lower = %c", max_upper, max_lower);
+    letter_count(words, word_count, mat, &max_upper, &max_lower);
+
+    // build this matrix
+    char expected[TOTAL_LETTERS][2] = {{'a', 1},{'b', 1},{'c', 1},{'d', 0},{'e', 0},{'f', 0},{'g', 1},{'h', 2},{'i', 0},{'j', 0},{'k', 0},{'l', 2},{'m', 0},{'n', 2},{'o', 1},{'p', 0},{'q', 1},{'r', 0},{'s', 0},{'t', 0},{'u', 2},{'v', 0},{'w', 0},{'x', 0},{'y', 0},{'z', 0},{'A', 0},{'B', 0},{'C', 0},{'D', 0},{'E', 0},{'F', 0},{'G', 0},{'H', 0},{'I', 0},{'J', 0},{'K', 0},{'L', 0},{'M', 0},{'N', 0},{'O', 0},{'P', 0},{'Q', 0},{'R', 0},{'S', 0},{'T', 0},{'U', 0},{'V', 0},{'W', 0},{'X', 0},{'Y', 0},{'Z', 0}};
+
+    assert(max_upper == ' ');
+    assert(max_lower == 'u');
+
+    for (int i = 0; i < TOTAL_LETTERS; i++) {
+        assert(mat[i][0] == expected[i][0]);
+        assert(mat[i][1] == expected[i][1]);
+    }
+    puts("OK!");
     return 0;
 }
 
