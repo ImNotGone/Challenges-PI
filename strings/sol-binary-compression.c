@@ -18,7 +18,7 @@ Consideraciones:
 Ejemplos:
 - Input: s = "esto es un 1010"
   Output: 1, s = "esto es un 10"
-             pos: [[9, 9]]
+             pos: [[11, 12]]
 
 - Input: s = "cumplo anios el 1101 del mes 111, habiendo nacido en 11111000001"
   Output: 3, s: cumplo anios el 13 del mes 7, habiendo nacido en 1985
@@ -42,6 +42,8 @@ Ejemplos:
 */
 
 #include <stdio.h>
+#include <assert.h>
+#include <string.h>
 
 static unsigned int binary_to_decimal(const char *s, unsigned int start, unsigned int end)
 {
@@ -77,7 +79,7 @@ static unsigned int decimal_length(unsigned int decimal)
 
 static void insert_decimal(char *s, unsigned int decimal, unsigned int start, unsigned int total_digits)
 {
-    /* 
+    /*
         obtenemos el mayor denominador para recorrer los digitos del numero de izquierda a derecha
     */
     unsigned int denominator = 1;
@@ -141,30 +143,68 @@ unsigned int binary_compression(char *s, unsigned int pos[][2])
 
 int main()
 {
-    // char s[] = "cumplo anios el 1101 del mes 111, habiendo nacido en 11111000001";
-    // char s[] = "esto es un 1010";
-    // char s[] = "este string no tiene numeros binarios";
-    // char s[] = "001";
-    // char s[] = "1111 por 10001 es equivalente a 11111111, lo cual es 255";
-    char s[] = "puedo tener 00000, o 000, o 00 que todo se convierte en 0";
+    char s0[] = "puedo tener 00000, o 000, o 00 que todo se convierte en 0";
     unsigned int pos[64][2];
-    unsigned int count = binary_compression(s, pos);
-    printf("count: %d\ns: %s\npos: [", count, s);
-    for (unsigned int i = 0; i < count; i++)
-    {
-        printf("[%d, %d]", pos[i][0], pos[i][1]);
-    }
-    printf("]\n");
+    unsigned int count = binary_compression(s0, pos);
 
-    for (unsigned int i = 0; i < count; i++)
-    {
-        unsigned int start = pos[i][0], end = pos[i][1];
-        printf("start: %d, end: %d, number: ", start, end);
-        for (unsigned int j = start; j <= end; j++)
-        {
-            printf("%c", s[j]);
-        }
-        printf("\n");
+    unsigned int expected_pos_0[][2] = {{12, 12}, {17, 17}, {22, 22}, {49, 49}};
+    assert(count == 4);
+    for(int i = 0; i < count; i++) {
+        assert(pos[i][0] == expected_pos_0[i][0]);
+        assert(pos[i][1] == expected_pos_0[i][1]);
     }
+    assert(strcmp(s0, "puedo tener 0, o 0, o 0 que todo se convierte en 0") == 0);
+
+    char s1[] = "1111 por 10001 es equivalente a 11111111, lo cual es 255";
+    count = binary_compression(s1, pos);
+
+    unsigned int expected_pos_1[][2] = {{0, 1}, {7, 8}, {27, 29}};
+    assert(count == 3);
+    for(int i = 0; i < count; i++) {
+        assert(pos[i][0] == expected_pos_1[i][0]);
+        assert(pos[i][1] == expected_pos_1[i][1]);
+    }
+    assert(strcmp(s1, "15 por 17 es equivalente a 255, lo cual es 255") == 0);
+
+
+    char s2[] = "001";
+    count = binary_compression(s2, pos);
+    unsigned int expected_pos_2[][2] = {{0, 0}};
+    assert(count == 1);
+    for(int i = 0; i < count; i++) {
+        assert(pos[i][0] == expected_pos_2[i][0]);
+        assert(pos[i][1] == expected_pos_2[i][1]);
+    }
+    assert(strcmp(s2, "1") == 0);
+
+
+    char s3[] = "este string no tiene numeros binarios";
+    count = binary_compression(s3, pos);
+    assert(count == 0);
+    assert(strcmp(s3, "este string no tiene numeros binarios") == 0);
+
+
+    char s4[] = "esto es un 1010";
+    count = binary_compression(s4, pos);
+    unsigned int expected_pos_4[][2] = {{11, 12}};
+    assert(count = 1);
+    for(int i = 0; i < count; i++) {
+        assert(pos[i][0] == expected_pos_4[i][0]);
+        assert(pos[i][1] == expected_pos_4[i][1]);
+    }
+    assert(strcmp(s4, "esto es un 10") == 0);
+
+
+    char s5[] = "cumplo anios el 1101 del mes 111, habiendo nacido en 11111000001";
+    count = binary_compression(s5, pos);
+    assert(count = 3);
+    unsigned int expected_pos_5[][2] = {{16, 17}, {27, 27}, {49, 52}};
+    for(int i = 0; i < count; i++) {
+        assert(pos[i][0] == expected_pos_5[i][0]);
+        assert(pos[i][1] == expected_pos_5[i][1]);
+    }
+    assert(strcmp(s5, "cumplo anios el 13 del mes 7, habiendo nacido en 1985") == 0);
+
+    puts("OK!");
     return 0;
 }
