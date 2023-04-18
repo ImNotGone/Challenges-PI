@@ -34,7 +34,7 @@ Ejemplos:
 
 - Input: s = "1111 por 10001 es equivalente a 11111111, lo cual es 255"
   Output: 1, s = "15 por 17 es equivalente a 255, lo cual es 255"
-             pos: [[0, 3]]
+             pos: [[0, 1][7, 8][27, 29]]
 
 - Input: s = "puedo tener 00000, o 000, o 00 que todo se convierte en 0"
   Output: 4, s = "puedo tener 0, o 0, o 0 que todo se convierte en 0"
