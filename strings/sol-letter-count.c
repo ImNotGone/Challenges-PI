@@ -51,22 +51,72 @@ int main()
 {
     char words[][N] = {"Hola", "Mundo", "Hola", "Mundo"};
     char mat[TOTAL_LETTERS][2];
-    printf("%d\n", 'z' - 'a' + 1);
     char max_upper, max_lower;
-    unsigned int word_count = sizeof(words) / sizeof(words[0]);
+    unsigned int word_count = 4;
     letter_count(words, word_count, mat, &max_upper, &max_lower);
-    print_matrix(mat);
-    printf("max_upper = '%c', max_lower = '%c'", max_upper, max_lower); 
-    // build this matrix
-    // char expected[TOTAL_LETTERS][2] = {{'a', 1},{'b', 1},{'c', 1},{'d', 0},{'e', 0},{'f', 0},{'g', 1},{'h', 2},{'i', 0},{'j', 0},{'k', 0},{'l', 2},{'m', 0},{'n', 2},{'o', 1},{'p', 0},{'q', 1},{'r', 0},{'s', 0},{'t', 0},{'u', 2},{'v', 0},{'w', 0},{'x', 0},{'y', 0},{'z', 0},{'A', 0},{'B', 0},{'C', 0},{'D', 0},{'E', 0},{'F', 0},{'G', 0},{'H', 0},{'I', 0},{'J', 0},{'K', 0},{'L', 0},{'M', 0},{'N', 0},{'O', 0},{'P', 0},{'Q', 0},{'R', 0},{'S', 0},{'T', 0},{'U', 0},{'V', 0},{'W', 0},{'X', 0},{'Y', 0},{'Z', 0}};
 
-    // assert(max_upper == ' ');
-    // assert(max_lower == 'u');
+    assert(max_upper == 'M');
+    assert(max_lower == 'o');
 
-    // for (int i = 0; i < TOTAL_LETTERS; i++) {
-    //     assert(mat[i][0] == expected[i][0]);
-    //     assert(mat[i][1] == expected[i][1]);
-    // }
+    char expected[TOTAL_LETTERS][2] = {
+        {'a', 2},{'b', 0},{'c', 0},{'d', 2},{'e', 0},{'f', 0},{'g', 0},{'h', 0},
+        {'i', 0},{'j', 0},{'k', 0},{'l', 2},{'m', 0},{'n', 2},{'o', 4},{'p', 0},
+        {'q', 0},{'r', 0},{'s', 0},{'t', 0},{'u', 2},{'v', 0},{'w', 0},{'x', 0},
+        {'y', 0},{'z', 0},{'A', 0},{'B', 0},{'C', 0},{'D', 0},{'E', 0},{'F', 0},
+        {'G', 0},{'H', 2},{'I', 0},{'J', 0},{'K', 0},{'L', 0},{'M', 2},{'N', 0},
+        {'O', 0},{'P', 0},{'Q', 0},{'R', 0},{'S', 0},{'T', 0},{'U', 0},{'V', 0},
+        {'W', 0},{'X', 0},{'Y', 0},{'Z', 0},
+    };
+
+    for(int i = 0; i < TOTAL_LETTERS; i++) {
+        assert(mat[i][0] == expected[i][0]);
+        assert(mat[i][1] == expected[i][1]);
+    }
+
+    char words0[][N] = {"hola", "esto", "es", "un", "ejemplo"};
+    word_count = 5;
+    letter_count(words0, word_count, mat, &max_upper, &max_lower);
+
+    assert(max_upper == ' ');
+    assert(max_lower == 'e');
+
+    char expected0[TOTAL_LETTERS][2] = {
+        {'a', 1},{'b', 0},{'c', 0},{'d', 0},{'e', 4},{'f', 0},{'g', 0},{'h', 1},
+        {'i', 0},{'j', 1},{'k', 0},{'l', 2},{'m', 1},{'n', 1},{'o', 3},{'p', 1},
+        {'q', 0},{'r', 0},{'s', 2},{'t', 1},{'u', 1},{'v', 0},{'w', 0},{'x', 0},
+        {'y', 0},{'z', 0},{'A', 0},{'B', 0},{'C', 0},{'D', 0},{'E', 0},{'F', 0},
+        {'G', 0},{'H', 0},{'I', 0},{'J', 0},{'K', 0},{'L', 0},{'M', 0},{'N', 0},
+        {'O', 0},{'P', 0},{'Q', 0},{'R', 0},{'S', 0},{'T', 0},{'U', 0},{'V', 0},
+        {'W', 0},{'X', 0},{'Y', 0},{'Z', 0}
+    };
+
+    for(int i = 0; i < TOTAL_LETTERS; i++) {
+        assert(mat[i][0] == expected0[i][0]);
+        assert(mat[i][1] == expected0[i][1]);
+    }
+
+    char words1[][N] = {"hola!!!", "qu3", "bu4n05", "l45", "ch4113ng35"};
+    word_count = 5;
+    letter_count(words1, word_count, mat, &max_upper, &max_lower);
+
+    char expected1[TOTAL_LETTERS][2] = {
+        {'a', 1},{'b', 1},{'c', 1},{'d', 0},{'e', 0},{'f', 0},{'g', 1},{'h', 2},
+        {'i', 0},{'j', 0},{'k', 0},{'l', 2},{'m', 0},{'n', 2},{'o', 1},{'p', 0},
+        {'q', 1},{'r', 0},{'s', 0},{'t', 0},{'u', 2},{'v', 0},{'w', 0},{'x', 0},
+        {'y', 0},{'z', 0},{'A', 0},{'B', 0},{'C', 0},{'D', 0},{'E', 0},{'F', 0},
+        {'G', 0},{'H', 0},{'I', 0},{'J', 0},{'K', 0},{'L', 0},{'M', 0},{'N', 0},
+        {'O', 0},{'P', 0},{'Q', 0},{'R', 0},{'S', 0},{'T', 0},{'U', 0},{'V', 0},
+        {'W', 0},{'X', 0},{'Y', 0},{'Z', 0}
+    };
+
+    for(int i = 0; i < TOTAL_LETTERS; i++) {
+        assert(mat[i][0] == expected1[i][0]);
+        assert(mat[i][1] == expected1[i][1]);
+    }
+
+    assert(max_upper == ' ');
+    assert(max_lower == 'u');
+
     puts("OK!");
     return 0;
 }
