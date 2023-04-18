@@ -45,7 +45,6 @@ Ejemplo:
 #define IS_LOWERCASE(letter) ('a' <= (letter) && (letter) <= 'z')
 
 void letter_count(const char words[][N], unsigned int word_count, char M[TOTAL_LETTERS][2], char *max_upper, char *max_lower);
-static void print_matrix(char M[TOTAL_LETTERS][2]);
 
 int main()
 {
@@ -119,14 +118,6 @@ int main()
 
     puts("OK!");
     return 0;
-}
-
-static void print_matrix(char M[TOTAL_LETTERS][2])
-{
-    for (int i = 0; i < TOTAL_LETTERS; i++)
-    {
-        printf("[%c, %d]", M[i][0], M[i][1]);
-    }
 }
 
 static void prepare_matrix(char M[TOTAL_LETTERS][2])
