@@ -15,12 +15,13 @@ Cada challenge tiene un nombre `<challenge-name>` y se divide en 2 archivos:
 
 - [Arrays](./arrays)
 - [Pointers](./pointers)
+- [Strings](./strings)
 
 ## Dudas
 
 En caso de tener dudas, abrir un issue en el repositorio.
 
 ## Contribuidores
--  [Gonzalo Martone](https://github.com/ImNotGone)
+- [Gonzalo Martone](https://github.com/ImNotGone)
 - [Octavio Serpe](https://github.com/OctavioSerpe)
 
