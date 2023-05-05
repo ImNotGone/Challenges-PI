@@ -23,6 +23,10 @@ Consideraciones:
 - No utilizar ciclos anidados.
 
 Ejemplos:
+- Input: vector = {1, 2, 3}, N = 3, quantities = {?, ?, ?}, M = 2
+- Output: { {2}, {1, 3} } porque 1 % 2 = 1, 2 % 2 = 0, 3 % 2 = 1
+          quantities = {1, 2}
+
 - Input: vector = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, N = 10, quantities = {?, ?, ?}, M = 3
 - Output: { {3, 6, 9}, {1, 4, 7, 10}, {2, 5, 8} } porque 1 % 3 = 1, 2 % 3 = 2, 3 % 3 = 0, 4 % 3 = 1, ...
           quantities = {3, 4, 3}
