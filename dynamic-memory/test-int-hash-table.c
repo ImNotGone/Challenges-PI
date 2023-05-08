@@ -41,44 +41,7 @@ Ejemplos:
 #include <stdlib.h>
 #include <assert.h>
 
-#define BLOCK_SIZE 10
-
-static unsigned int hash(unsigned int value, unsigned int M) {
-    return value % M;
-}
-
-static void init(unsigned int** hash_table, unsigned int* quantities, unsigned int M) {
-    for (unsigned int i = 0; i < M; i++) {
-        hash_table[i] = NULL;
-        quantities[i] = 0;
-    }
-}
-
-static void realloc_hash_table_items(unsigned int** hash_table, unsigned int* quantities, unsigned int N) {
-    for (unsigned int i = 0; i < N; ++i) {
-        // verificar si el bloque NO esta lleno
-        if(quantities[i] % BLOCK_SIZE < BLOCK_SIZE && quantities[i] != 0) {
-            hash_table[i] = realloc(hash_table[i], quantities[i] * sizeof(unsigned int));
-        }
-    }
-}
-unsigned int** int_hash_table(unsigned int* vector, unsigned int N, unsigned int* quantities, unsigned int M) {
-    unsigned int** hash_table = malloc(M * sizeof(unsigned int *));
-    init(hash_table, quantities, M);
-
-    for (unsigned int i = 0; i < N; ++i) {
-        unsigned int index = hash(vector[i], M);
-        if(quantities[index] % BLOCK_SIZE == 0) {
-            hash_table[index] = realloc(hash_table[index], (quantities[index] + BLOCK_SIZE) * sizeof(unsigned int));
-        }
-
-        hash_table[index][quantities[index]++] = vector[i];
-    }
-
-    realloc_hash_table_items(hash_table, quantities, M);
-
-    return hash_table;
-}
+unsigned int** int_hash_table(unsigned int* vector, unsigned int N, unsigned int* quantities, unsigned int M);
 
 int main() {
     unsigned int vector[] = {1, 1, 1, 6, 6, 4, 0};
@@ -114,6 +77,9 @@ int main() {
     // los pueden ver utilizando la flag -fsanitize=address
     // resuelvanlos :D
     puts("OK!");
-
     return 0;
+}
+
+unsigned int** int_hash_table(unsigned int* vector, unsigned int N, unsigned int* quantities, unsigned int M) {
+
 }
