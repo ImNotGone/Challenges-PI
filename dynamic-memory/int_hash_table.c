@@ -57,7 +57,7 @@ static void init(unsigned int** hash_table, unsigned int* quantities, unsigned i
 static void realloc_hash_table_items(unsigned int** hash_table, unsigned int* quantities, unsigned int N) {
     for (unsigned int i = 0; i < N; ++i) {
         // verificar si el bloque NO esta lleno
-        if(quantities[i] % BLOCK_SIZE < BLOCK_SIZE) {
+        if(quantities[i] % BLOCK_SIZE < BLOCK_SIZE && quantities[i] != 0) {
             hash_table[i] = realloc(hash_table[i], quantities[i] * sizeof(unsigned int));
         }
     }
@@ -88,17 +88,15 @@ int main() {
 
     unsigned int** hash_table = int_hash_table(vector, N, quantities, M);
 
-    int expected_quantities[] = {1, 5, 0, 0, 1};
-    int r1[] = {0};
-    int r2[] = {1, 1, 1, 6, 6};
-    int r3[] = {0}; // NULL
-    int r4[] = {0}; // NULL
-    int r5[] = {4};
-    int * expected_map[] = {
+    unsigned int expected_quantities[] = {1, 5, 0, 0, 1};
+    unsigned int r1[] = {0};
+    unsigned int r2[] = {1, 1, 1, 6, 6};
+    unsigned int r5[] = {4};
+    unsigned int * expected_map[] = {
         r1,
         r2,
-        r3,
-        r4,
+        NULL,
+        NULL,
         r5
     };
 
@@ -108,12 +106,7 @@ int main() {
             assert(hash_table[i][j] == expected_map[i][j]);
         }
         if(quantities[i] == 0) {
-            // Esto lo tuve que comentar, porque como en el realloc_hash_table_items
-            // haces realloc de 0 -> hace un free de la direccion que le mandaste
-            // -> cuando me quiero fijar si en esa posicion quedo un NULL
-            // el fsanitize tira que lei de una posicion que no estaba reservada
-
-            //assert(hash_table[i][0] == expected_map[i][0]);
+            assert(hash_table[i] == expected_map[i]);
         }
     }
 
