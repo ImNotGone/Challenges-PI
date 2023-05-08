@@ -11,6 +11,8 @@ a una funcion provista llamada hash() que recibe un entero y la cantidad de punt
 y devuelve un entero positivo menor a M. En caso que no haya ningun elemento para un
 puntero, se asignara NULL.
 
+La funcion hash() se encuentra ya implementada, es provista y NO debe modificarse.
+
 Prototipo:
 unsigned int** int_hash_table(unsigned int* vector, unsigned int N, unsigned int* quantities, unsigned int M) {
 
@@ -86,6 +88,10 @@ int main() {
     return 0;
 }
 
+/*
+funcion hash() que recibe un entero y la cantidad de punteros M,
+y devuelve un entero positivo menor a M
+*/
 static unsigned int hash(unsigned int value, unsigned int M) {
     return value % M;
 }
