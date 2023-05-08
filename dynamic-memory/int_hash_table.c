@@ -8,7 +8,7 @@ quantities[i].
 
 Cada elemento del vector recibido se asignara al puntero correspondiente de acuerdo
 a una funcion provista llamada hash() que recibe un entero y la cantidad de punteros M,
-y devuelve un entero positivo menor a M. En caso que no haya ningun elemento para un 
+y devuelve un entero positivo menor a M. En caso que no haya ningun elemento para un
 puntero, se asignara NULL.
 
 Prototipo:
@@ -39,6 +39,7 @@ Ejemplos:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #define BLOCK_SIZE 10
 
@@ -87,19 +88,39 @@ int main() {
 
     unsigned int** hash_table = int_hash_table(vector, N, quantities, M);
 
-    for (unsigned int i = 0; i < M; ++i) {
-        printf("quantity = %d and hash_table[%d] = {", quantities[i], i);
-        for (unsigned int j = 0; j < quantities[i]; ++j) {
-            printf("%d, ", hash_table[i][j]);
+    int expected_quantities[] = {1, 5, 0, 0, 1};
+    int r1[] = {0};
+    int r2[] = {1, 1, 1, 6, 6};
+    int r3[] = {0}; // NULL
+    int r4[] = {0}; // NULL
+    int r5[] = {4};
+    int * expected_map[] = {
+        r1,
+        r2,
+        r3,
+        r4,
+        r5
+    };
+
+    for (int i = 0 ; i < M; i++) {
+        assert(quantities[i] == expected_quantities[i]);
+        for (int j = 0; j < expected_quantities[i]; j++) {
+            assert(hash_table[i][j] == expected_map[i][j]);
         }
-        printf("}\n");
+        if(quantities[i] == 0) {
+            // Esto lo tuve que comentar, porque como en el realloc_hash_table_items
+            // haces realloc de 0 -> hace un free de la direccion que le mandaste
+            // -> cuando me quiero fijar si en esa posicion quedo un NULL
+            // el fsanitize tira que lei de una posicion que no estaba reservada
+
+            //assert(hash_table[i][0] == expected_map[i][0]);
+        }
     }
 
-    /* LIBERAR MEMORIA DINAMICA GUARDADA (borrar la solucion)*/
-    for (unsigned int i = 0; i < M; ++i) {
-        free(hash_table[i]);
-    }
-    free(hash_table);
+    // ESTE PROGRAMA TIENE LEAKS DE MEMORIA,
+    // los pueden ver utilizando la flag -fsanitize=address
+    // resuelvanlos :D
+    puts("OK!");
 
     return 0;
 }
