@@ -27,6 +27,7 @@ Consideraciones:
 - Si el monto de una transaccion es negativo, no se debe agregar a la blockchain
 - En caso de que una transaccion supere el monto maximo, se debe dividir en transacciones mas pequeñas, todas asociadas al mismo identificador
 - Si se llega al limite de transacciones por bloque, se debe crear un nuevo bloque
+- Utilizar typedef's para las estructuras
 - Modularizar siempre que se pueda
 - Utilizar los tipos de datos (ej. unsigned int, size_t, etc.) y modificadores (ej. const, static, etc.) adecuados
 - Evaluar cuando se debe usar memoria dinamica, que funcion y liberar todo lo reservado (con la funcion free_blockchain())
