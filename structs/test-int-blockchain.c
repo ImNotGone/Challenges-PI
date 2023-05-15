@@ -59,7 +59,7 @@ Ejemplos:
 - Input:
     idem primer ejemplo pero con transactions_per_block: 2 y max_transaction_amount: 60
 - Output:
-    blockchain (size: 5):
+    blockchain (size: 6):
         - bloque 1 (size: 2, amount: 100): tx (id: 0, amount: 60, sender: A, receiver: D), tx (id: 0, amount: 40, sender: A, receiver: D)
         - bloque 2 (size: 2, amount: 120): tx (id: 1, amount: 60, sender: B, receiver: E), tx (id: 1, amount: 60, sender: B, receiver: E)
         - bloque 3 (size: 2, amount: 80): tx (id: 1, amount: 60, sender: B, receiver: E), tx (id: 1, amount: 20, sender: B, receiver: E)
@@ -84,6 +84,7 @@ Ejemplos:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #define BLOCK_SIZE 100
 
@@ -216,8 +217,8 @@ S_Blockchain *create_blockchain(const char **senders, const char **receivers, co
         }
     }
 
-    /* 
-        verificar si el ultimo bloque esta vacio (se pudo haber creado por el expand_blockchain() de 
+    /*
+        verificar si el ultimo bloque esta vacio (se pudo haber creado por el expand_blockchain() de
             if (blockchain->size == 0 || reached_current_block_limits(blockchain))
     */
     if (blockchain->blocks[blockchain->size - 1].size == 0)
@@ -237,25 +238,180 @@ S_Blockchain *create_blockchain(const char **senders, const char **receivers, co
 
 int main()
 {
-    const char *senders[3] = {"A", "B", "C"};
-    const char *receivers[3] = {"D", "E", "F"};
-    const int amounts[3] = {0, 4, -9};
-    unsigned int transactions = 3;
-    unsigned int transactions_per_block = 2;
-    unsigned int max_transaction_amount = 150;
+    S_Blockchain *blockchain;
+    unsigned int transactions;
+    unsigned int transactions_per_block;
+    unsigned int max_transaction_amount;
 
-    S_Blockchain *blockchain = create_blockchain(senders, receivers, amounts, transactions, transactions_per_block, max_transaction_amount);
+    // Ejemplo 1
+    const char * senders1[3] = {"A", "B", "C"};
+    const char * receivers1[3] = {"D", "E", "F"};
+    const int amounts1[3] = {100, 200, 300};
+    transactions = 3;
+    transactions_per_block = 2;
+    max_transaction_amount = 150;
 
-    printf("blockchain (size: %d):\n", blockchain->size);
-    for (unsigned int i = 0; i < blockchain->size; i++)
-    {
-        printf("\t- bloque %d (size: %d, amount: %d): ", i + 1, blockchain->blocks[i].size, blockchain->blocks[i].amount);
-        for (unsigned int j = 0; j < blockchain->blocks[i].size; j++)
-        {
-            printf("tx (id: %d, amount: %d, sender: %s, receiver: %s), ", blockchain->blocks[i].transactions[j].id, blockchain->blocks[i].transactions[j].amount, blockchain->blocks[i].transactions[j].sender, blockchain->blocks[i].transactions[j].receiver);
-        }
-        printf("\n");
-    }
+    blockchain = create_blockchain(senders1, receivers1, amounts1, transactions, transactions_per_block, max_transaction_amount);
+
+    assert(blockchain->size == 3);
+    assert(blockchain->transactions_per_block == 2);
+    assert(blockchain->max_transaction_amount == 150);
+
+    assert(blockchain->blocks[0].size == 2);
+    assert(blockchain->blocks[0].amount == 250);
+
+    assert(blockchain->blocks[0].transactions[0].id == 0);
+    assert(blockchain->blocks[0].transactions[0].amount == 100);
+    assert(strcmp(blockchain->blocks[0].transactions[0].sender, "A") == 0);
+    assert(strcmp(blockchain->blocks[0].transactions[0].receiver, "D") == 0);
+
+
+    assert(blockchain->blocks[0].transactions[1].id == 1);
+    assert(blockchain->blocks[0].transactions[1].amount == 150);
+    assert(strcmp(blockchain->blocks[0].transactions[1].sender, "B") == 0);
+    assert(strcmp(blockchain->blocks[0].transactions[1].receiver, "E") == 0);
+
+    assert(blockchain->blocks[1].size == 2);
+    assert(blockchain->blocks[1].amount == 200);
+
+    assert(blockchain->blocks[1].transactions[0].id == 1);
+    assert(blockchain->blocks[1].transactions[0].amount == 50);
+    assert(strcmp(blockchain->blocks[1].transactions[0].sender, "B") == 0);
+    assert(strcmp(blockchain->blocks[1].transactions[0].receiver, "E") == 0);
+
+
+    assert(blockchain->blocks[1].transactions[1].id == 2);
+    assert(blockchain->blocks[1].transactions[1].amount == 150);
+    assert(strcmp(blockchain->blocks[1].transactions[1].sender, "C") == 0);
+    assert(strcmp(blockchain->blocks[1].transactions[1].receiver, "F") == 0);
+
+    assert(blockchain->blocks[2].size == 1);
+    assert(blockchain->blocks[2].amount == 150);
+
+    assert(blockchain->blocks[2].transactions[0].id == 2);
+    assert(blockchain->blocks[2].transactions[0].amount == 150);
+    assert(strcmp(blockchain->blocks[2].transactions[0].sender, "C") == 0);
+    assert(strcmp(blockchain->blocks[2].transactions[0].receiver, "F") == 0);
+
+    free_blockchain(blockchain);
+
+    // Ejemplo 3
+    const char *senders3[3] = {"A", "B", "C"};
+    const char *receivers3[3] = {"D", "E", "F"};
+    const int amounts3[3] = {100, 200, 300};
+    transactions = 3;
+    transactions_per_block = 2;
+    max_transaction_amount = 60;
+
+    blockchain = create_blockchain(senders3, receivers3, amounts3, transactions, transactions_per_block, max_transaction_amount);
+    assert(blockchain->size == 6);
+    assert(blockchain->transactions_per_block == 2);
+    assert(blockchain->max_transaction_amount == 60);
+
+    assert(blockchain->blocks[0].size == 2);
+    assert(blockchain->blocks[0].amount == 100);
+
+    assert(blockchain->blocks[0].transactions[0].id == 0);
+    assert(blockchain->blocks[0].transactions[0].amount == 60);
+    assert(strcmp(blockchain->blocks[0].transactions[0].sender, "A") == 0);
+    assert(strcmp(blockchain->blocks[0].transactions[0].receiver, "D") == 0);
+
+
+    assert(blockchain->blocks[0].transactions[1].id == 0);
+    assert(blockchain->blocks[0].transactions[1].amount == 40);
+    assert(strcmp(blockchain->blocks[0].transactions[1].sender, "A") == 0);
+    assert(strcmp(blockchain->blocks[0].transactions[1].receiver, "D") == 0);
+
+    assert(blockchain->blocks[1].size == 2);
+    assert(blockchain->blocks[1].amount == 120);
+
+    assert(blockchain->blocks[1].transactions[0].id == 1);
+    assert(blockchain->blocks[1].transactions[0].amount == 60);
+    assert(strcmp(blockchain->blocks[1].transactions[0].sender, "B") == 0);
+    assert(strcmp(blockchain->blocks[1].transactions[0].receiver, "E") == 0);
+
+
+    assert(blockchain->blocks[1].transactions[1].id == 1);
+    assert(blockchain->blocks[1].transactions[1].amount == 60);
+    assert(strcmp(blockchain->blocks[1].transactions[1].sender, "B") == 0);
+    assert(strcmp(blockchain->blocks[1].transactions[1].receiver, "E") == 0);
+
+    assert(blockchain->blocks[2].size == 2);
+    assert(blockchain->blocks[2].amount == 80);
+
+    assert(blockchain->blocks[2].transactions[0].id == 1);
+    assert(blockchain->blocks[2].transactions[0].amount == 60);
+    assert(strcmp(blockchain->blocks[2].transactions[0].sender, "B") == 0);
+    assert(strcmp(blockchain->blocks[2].transactions[0].receiver, "E") == 0);
+
+    assert(blockchain->blocks[2].transactions[1].id == 1);
+    assert(blockchain->blocks[2].transactions[1].amount == 20);
+    assert(strcmp(blockchain->blocks[2].transactions[1].sender, "B") == 0);
+    assert(strcmp(blockchain->blocks[2].transactions[1].receiver, "E") == 0);
+
+    assert(blockchain->blocks[3].size == 2);
+    assert(blockchain->blocks[3].amount == 120);
+
+    assert(blockchain->blocks[3].transactions[0].id == 2);
+    assert(blockchain->blocks[3].transactions[0].amount == 60);
+    assert(strcmp(blockchain->blocks[3].transactions[0].sender, "C") == 0);
+    assert(strcmp(blockchain->blocks[3].transactions[0].receiver, "F") == 0);
+
+    assert(blockchain->blocks[3].transactions[1].id == 2);
+    assert(blockchain->blocks[3].transactions[1].amount == 60);
+    assert(strcmp(blockchain->blocks[3].transactions[1].sender, "C") == 0);
+    assert(strcmp(blockchain->blocks[3].transactions[1].receiver, "F") == 0);
+
+    assert(blockchain->blocks[4].size == 2);
+    assert(blockchain->blocks[4].amount == 120);
+
+    assert(blockchain->blocks[4].transactions[0].id == 2);
+    assert(blockchain->blocks[4].transactions[0].amount == 60);
+    assert(strcmp(blockchain->blocks[4].transactions[0].sender, "C") == 0);
+    assert(strcmp(blockchain->blocks[4].transactions[0].receiver, "F") == 0);
+
+    assert(blockchain->blocks[4].transactions[1].id == 2);
+    assert(blockchain->blocks[4].transactions[1].amount == 60);
+    assert(strcmp(blockchain->blocks[4].transactions[1].sender, "C") == 0);
+    assert(strcmp(blockchain->blocks[4].transactions[1].receiver, "F") == 0);
+
+    assert(blockchain->blocks[5].size == 1);
+    assert(blockchain->blocks[5].amount == 60);
+
+    assert(blockchain->blocks[5].transactions[0].id == 2);
+    assert(blockchain->blocks[5].transactions[0].amount == 60);
+    assert(strcmp(blockchain->blocks[5].transactions[0].sender, "C") == 0);
+    assert(strcmp(blockchain->blocks[5].transactions[0].receiver, "F") == 0);
+
+    free_blockchain(blockchain);
+
+    // Ejemplo 5
+    const char *senders5[3] = {"A", "B", "C"};
+    const char *receivers5[3] = {"D", "E", "F"};
+    const int amounts5[3] = {0, 4, -9};
+
+    transactions = 3;
+    transactions_per_block = 2;
+    max_transaction_amount = 150;
+
+    blockchain = create_blockchain(senders5, receivers5, amounts5, transactions, transactions_per_block, max_transaction_amount);
+    assert(blockchain->size == 1);
+    assert(blockchain->transactions_per_block == 2);
+    assert(blockchain->max_transaction_amount == 150);
+
+    assert(blockchain->blocks->size == 2);
+    assert(blockchain->blocks->amount == 4);
+
+    assert(blockchain->blocks->transactions[0].id == 0);
+    assert(blockchain->blocks->transactions[0].amount == 0);
+    assert(strcmp(blockchain->blocks->transactions[0].sender, "A") == 0);
+    assert(strcmp(blockchain->blocks->transactions[0].receiver, "D") == 0);
+
+
+    assert(blockchain->blocks->transactions[1].id == 1);
+    assert(blockchain->blocks->transactions[1].amount == 4);
+    assert(strcmp(blockchain->blocks->transactions[1].sender, "B") == 0);
+    assert(strcmp(blockchain->blocks->transactions[1].receiver, "E") == 0);
 
     free_blockchain(blockchain);
 
