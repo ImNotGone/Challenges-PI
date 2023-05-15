@@ -113,14 +113,128 @@ typedef struct
     unsigned int size;                    // cantidad de bloques
 } S_Blockchain;
 
+/* ESTO LO TIENEN QUE IMPLEMENTAR ELLOS */
 void free_blockchain(S_Blockchain *blockchain)
 {
-    // TODO: implementar
+    // liberar cada bloque
+    for (unsigned int i = 0; i < blockchain->size; i++)
+    {
+        for (unsigned int j = 0; j < blockchain->blocks[i].size; j++)
+        {
+            free(blockchain->blocks[i].transactions[j].sender);
+            free(blockchain->blocks[i].transactions[j].receiver);
+        }
+        free(blockchain->blocks[i].transactions);
+    }
+
+    // liberar los bloques y la blockchain
+    free(blockchain->blocks);
+    free(blockchain);
+}
+
+static S_Transaction create_transaction(int id, int amount, const char *sender, const char *receiver)
+{
+    S_Transaction tx = {.id = id, .amount = amount};
+    tx.sender = malloc(strlen(sender) + 1);
+    strcpy(tx.sender, sender);
+
+    tx.receiver = malloc(strlen(receiver) + 1);
+    strcpy(tx.receiver, receiver);
+
+    return tx;
+}
+
+static S_Block create_block(unsigned int transactions_per_block)
+{
+    S_Block block = {.size = 0, .amount = 0};
+    block.transactions = calloc(transactions_per_block, sizeof(S_Transaction));
+    return block;
+}
+
+static char reached_current_block_limits(S_Blockchain *blockchain)
+{
+    return blockchain->blocks[blockchain->size - 1].size == blockchain->transactions_per_block;
+}
+
+static void expand_blockchain(S_Blockchain *blockchain)
+{
+    // agregar mas espacio a la blockchain si es necesario
+    if (blockchain->size % BLOCK_SIZE == 0)
+    {
+        blockchain->blocks = realloc(blockchain->blocks, (blockchain->size + BLOCK_SIZE) * sizeof(S_Block));
+    }
+
+    // inicializar el nuevo bloque
+    blockchain->blocks[blockchain->size] = create_block(blockchain->transactions_per_block);
+    blockchain->size++;
 }
 
 S_Blockchain *create_blockchain(const char **senders, const char **receivers, const int *amounts, unsigned int transactions, unsigned int transactions_per_block, unsigned int max_transaction_amount)
 {
-    // TODO: implementar
+    // crear la blockchain base
+    S_Blockchain *blockchain = calloc(1, sizeof(S_Blockchain));
+    blockchain->transactions_per_block = transactions_per_block;
+    blockchain->max_transaction_amount = max_transaction_amount;
+
+    // iterar por cada transaccion
+    for (unsigned int i = 0; i < transactions; i++)
+    {
+        // si estoy en el principio o se llego a los limites dentro del bloque actual, expandir
+        if (blockchain->size == 0 || reached_current_block_limits(blockchain))
+        {
+            expand_blockchain(blockchain);
+        }
+
+        // insertar la tx en la blockchain solo si el monto es valido
+        if (amounts[i] >= 0)
+        {
+            int remaining_amount = amounts[i];
+            do
+            {
+                // obtener el monto de la tx
+                int amount = remaining_amount > blockchain->max_transaction_amount ? blockchain->max_transaction_amount : remaining_amount;
+                remaining_amount -= amount;
+
+                // crear la tx
+                blockchain->blocks[blockchain->size - 1].transactions[blockchain->blocks[blockchain->size - 1].size] = create_transaction(i, amount, senders[i], receivers[i]);
+                blockchain->blocks[blockchain->size - 1].size++;
+                blockchain->blocks[blockchain->size - 1].amount += amount;
+
+                /*
+                ------------------------------ UNA ALTERNATIVA ------------------------------
+                  S_Block *current_block = &blockchain->blocks[blockchain->size - 1];
+                  current_block->transactions[current_block->size] = create_transaction(i, amount, senders[i], receivers[i]);
+                  current_block->size++;
+                  current_block->amount += amount;
+                -----------------------------------------------------------------------------
+                */
+
+                // si se llego a los limites dentro del bloque actual y aun queda monto, expandir
+                if (remaining_amount > 0 && reached_current_block_limits(blockchain))
+                {
+                    expand_blockchain(blockchain);
+                }
+            } while (remaining_amount > 0);
+        }
+    }
+
+    /*
+        verificar si el ultimo bloque esta vacio (se pudo haber creado por el expand_blockchain() de
+            if (blockchain->size == 0 || reached_current_block_limits(blockchain))
+    */
+    if (blockchain->blocks[blockchain->size - 1].size == 0)
+    {
+        free(blockchain->blocks[blockchain->size - 1].transactions);
+        blockchain->size--;
+    }
+
+    // reallocar el ultimo bloque para que no queden transacciones vacias
+    blockchain->blocks[blockchain->size - 1].transactions = realloc(blockchain->blocks[blockchain->size - 1].transactions, blockchain->blocks[blockchain->size - 1].size * sizeof(S_Transaction));
+
+    // reallocar los bloques para que no queden espacios vacios
+    blockchain->blocks = realloc(blockchain->blocks, blockchain->size * sizeof(S_Block));
+
+    return blockchain;
 }
 
 int main()
