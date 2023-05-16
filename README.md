@@ -17,6 +17,7 @@ Cada challenge tiene un nombre `<challenge-name>` y se divide en 2 archivos:
 - [Pointers](./pointers)
 - [Strings](./strings)
 - [Dynamic Memory](./dynamic-memory)
+- [Structs] (./structs)
 
 ## Dudas
 
