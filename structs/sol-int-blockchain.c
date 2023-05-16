@@ -416,5 +416,6 @@ int main()
 
     free_blockchain(blockchain);
 
+    puts("OK!");
     return 0;
 }
