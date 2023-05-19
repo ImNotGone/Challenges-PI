@@ -62,22 +62,22 @@ char html_verifier(const char* html);
 
 Ejemplos:
 - Input: "<html><head><title/></head></html>"
-  Output: 1
+  Output: 1 -> el archivo es valido porque todos los tags tienen su correspondiente tag de cierre, estan balanceados y hay un tag de solo cierre.
 
 - Input: "<html><head><title/></head>"
-  Output: 0
+  Output: 0 -> el archivo no es valido porque falta el tag de cierre </html> al final
 
 - Input: "<html><body></html>"
-  Output: 0
+  Output: 0 -> el archivo no es valido porque el tag <body> deberia ser <body/>
 
 - Input: "<html><body><p>"
-  Output: 0
+  Output: 0 -> ningun tag se cierra
 
 - Input: "<html><body/><p>"
-  Output: 0
+  Output: 0 -> el tag <html> no se cierra y aparece un tag <p> de apertura luego de un tag de solo cierre
 
 - Input: "<html><body><p><title/></p></body></html>"
-  Output: 1
+  Output: 1 -> el archivo es valido porque todos los tags tienen su correspondiente tag de cierre, estan balanceados y hay un tag de solo cierre.
 */
 
 #include <stdio.h>
