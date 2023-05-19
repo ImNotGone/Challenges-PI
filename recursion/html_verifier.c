@@ -1,5 +1,14 @@
 /*
-HTML es un lenguaje de marcado que se utiliza para el desarrollo de paginas de internet.
+#################################################
+    NIVEL DE DIFICULTAD: 10/10 - Es mas dificil que cualquier ejercicio de parcial [VERIFICADO]
+#################################################
+
+HTML es un lenguaje de etiquetado que se utiliza para el desarrollo de paginas de internet.
+Un tag esta compuesto por un nombre encerrado entre < y >. Por ejemplo, <html> es un tag y 
+se considera de apertura. El tag </html> es un tag de cierre. Ademas, existen tags que no tienen
+apertura ni cierre, como <title/>, que directamente se considera que esta cerrado. Por ultimo,
+existen tags que tienen un nombre y un contenido, como <p>Este es el contenido</p>.
+
 Un archivo .html tendria algo como esto:
 <html>
     <head>
@@ -11,8 +20,8 @@ Un archivo .html tendria algo como esto:
     </body>
 </html>
 
-En este caso vamos a desestimar la posibilidad de tener string dentro de los tags e inclusive
-la posibilidad que un tag tenga multiples tags hijos, entonces el ejemplo previo quedaria como:
+En este caso vamos a desestimar la posibilidad de tener strings (contenido) dentro de los tags e inclusive
+la posibilidad de que un tag tenga multiples tags hijos, entonces el ejemplo previo quedaria como:
 <html>
   <head>
     <title/>
@@ -29,9 +38,27 @@ Se pide implementar una funcion html_verifier() que reciba un string que represe
 - Todos los tags de apertura tienen su correspondiente tag de cierre.
 - Los tags de apertura y cierre estan balanceados, es decir, si se abre un tag <head> y luego
   un tag <body>, el tag <body> se cierra antes que el tag </head>.
+- Se encuentra presente un tag de solo cierre, como <title/>
+
+Consideraciones:
+- Se garantiza que el string recibido representa un archivo .html con las condiciones mencionadas,
+es decir, solamente se incluyen tags pero NO se garantiza que el archivo sea valido (puede que falten
+tags de cierre, que esten desbalanceados, etc).
+- Se garantiza que los nombres de los tags tienen como maximo 20 caracteres.
+- Se pueden utilizar funciones de la biblioteca string.h y stdlib.h.
+- No reservar memoria dinamica a menos que sea necesario.
+
+Tips:
+- Buscar el tag de solo cierre y empezar a validar desde ahi.
+- Combinar recursion de tipo stack (FILO) con recursion de tipo cola (FIFO).
+- Pensar en como se puede validar un tag de apertura y su correspondiente tag de cierre, ¿como puede
+un llamado proximo modificar valores del actual?
+- Pensar si con el prototipo mencionado alcanza para resolver el problema o si se necesita
+alguna funcion extra.
+- Jugar muchos con punteros y aritmetica de punteros.
 
 Prototipo:
-int html_verifier(const char* html);
+char html_verifier(const char* html);
 
 Ejemplos:
 - Input: "<html><head><title/></head></html>"
@@ -45,6 +72,12 @@ Ejemplos:
 
 - Input: "<html><body><p>"
   Output: 0
+
+- Input: "<html><body/><p>"
+  Output: 0
+
+- Input: "<html><body><p><title/></p></body></html>"
+  Output: 1
 */
 
 #include <stdio.h>
@@ -53,8 +86,9 @@ Ejemplos:
 
 #define REACHED_END 1
 #define INVALID 0
+#define MAX_TAG_NAME_LEN 20
 
-static int html_verifier_rec(char **html) {
+static char html_verifier_rec(char **html) {
     if (html[0] == '\0') {
         return REACHED_END;
     }
@@ -77,56 +111,41 @@ static int html_verifier_rec(char **html) {
     // mueve el puntero al final del tag asi continua iterando (recordar que hay que saltear el >)
     *html += tag_len + 1;
 
-    printf("moved: %s\n", *html);
-
     // si es un tag de cierre, llegue al tag del medio
     if (is_end_tag) {
         return REACHED_END;
     }
 
     // guardo el nombre del tag
-    char *tag_name = calloc(tag_len + 1, sizeof(char));
+    char tag_name[MAX_TAG_NAME_LEN + 1] = {0};
     strncpy(tag_name, tag_start, tag_len);
-
-    printf("tag_name: %s\n", tag_name);
-
 
     // si no es un tag de cierre, busco el tag de cierre
     int value = html_verifier_rec(html);
-    printf("remaining: %s\n", *html);
 
-    // si es invalido, ni me gasto en seguir
-    if (value == INVALID) {
-        free(tag_name);
-        return INVALID;
-    }
-
-    // al volver de la recursion, ver si se llego al final o no
-    if (**html == '\0') {
-        free(tag_name);
+    // si es invalido o llegue al final de la recursion, ni me gasto en seguir
+    if (value == INVALID || **html == '\0') {
         return INVALID;
     }
 
     // ver si el tag de cierre es el correcto -> OJO! puede que sea mas corto que el tag de apertura y pisar memoria invalida
+    // una opcion mas precisa seria comparar caracter a caracter hasta llegar al > de alguno de los dos
     *html += 2; // salteo </
     if (strncmp(*html, tag_name, tag_len) != 0) {
-        free(tag_name);
         return INVALID;
     }
 
-    free(tag_name);
-
-    // salteo el tag + >
+    // salteo el tag + >, asi queda apuntando al siguiente tag para el llamado previo
     *html += tag_len + 1;
 
     return value;
 }
 
-int html_verifier(const char *html) {
+char html_verifier(const char *html) {
     char *html_copy = calloc(strlen(html) + 1, sizeof(char));
     strcpy(html_copy, html);
 
-    int value = html_verifier_rec(&html_copy);
+    char value = html_verifier_rec(&html_copy);
 
     free(html_copy);
 
@@ -138,16 +157,7 @@ int main() {
     printf("%d\n", html_verifier("<html><head><title/></head>"));
     printf("%d\n", html_verifier("<html><body></html>"));
     printf("%d\n", html_verifier("<html><body><p>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-    // printf("%d\n", html_verifier("<html><head><title/></head><body><h1></h1></body></html>"));
-
+    printf("%d\n", html_verifier("<html><body/><p>"));
+    printf("%d\n", html_verifier("<html><body><p><title/></p></body></html>"));
     return 0;
 }
