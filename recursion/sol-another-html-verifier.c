@@ -89,6 +89,7 @@ Ejemplos:
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #define REACHED_END 1
 #define INVALID 0
@@ -183,11 +184,13 @@ char html_verifier(const char *html)
 
 int main()
 {
-    printf("%d\n", html_verifier("<html><head><title/></head></html>"));
-    printf("%d\n", html_verifier("<html><head><title/></head>"));
-    printf("%d\n", html_verifier("<html><body></html>"));
-    printf("%d\n", html_verifier("<html><body><p>"));
-    printf("%d\n", html_verifier("<html><body/><p>"));
-    printf("%d\n", html_verifier("<html><body><p><title/></p></body></html>"));
+    assert(1 ==  html_verifier("<html><head><title/></head></html>"));
+    assert(0 ==  html_verifier("<html><head><title/></head>"));
+    assert(0 ==  html_verifier("<html><body></html>"));
+    assert(0 ==  html_verifier("<html><body><p>"));
+    assert(0 ==  html_verifier("<html><body/><p>"));
+    assert(1 ==  html_verifier("<html><body><p><title/></p></body></html>"));
+
+    puts("OK!");
     return 0;
 }
