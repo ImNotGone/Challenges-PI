@@ -1,10 +1,10 @@
 /*
 #################################################
-    NIVEL DE DIFICULTAD: 10/10 - Es mas dificil que cualquier ejercicio de parcial [VERIFICADO]
+    NIVEL DE DIFICULTAD (con las consideraciones extra): 10/10 - Es mas dificil que cualquier ejercicio de parcial [VERIFICADO]
 #################################################
 
 HTML es un lenguaje de etiquetado que se utiliza para el desarrollo de paginas de internet.
-Un tag esta compuesto por un nombre encerrado entre < y >. Por ejemplo, <html> es un tag y 
+Un tag esta compuesto por un nombre encerrado entre < y >. Por ejemplo, <html> es un tag y
 se considera de apertura. El tag </html> es un tag de cierre. Ademas, existen tags que no tienen
 apertura ni cierre, como <title/>, que directamente se considera que esta cerrado. Por ultimo,
 existen tags que tienen un nombre y un contenido, como <p>Este es el contenido</p>.
@@ -30,7 +30,7 @@ la posibilidad de que un tag tenga multiples tags hijos, entonces el ejemplo pre
 
 Notar como la apertura de un tag es con <, el nombre del tag en el medio y al final >.
 Para cerrar dicho tag se añade un / antes del nombre del tag. Ademas, los tags que solamente
-son de apertura se pueden cerrar en la misma linea, como el tag <title/> del ejemplo anterior 
+son de apertura se pueden cerrar en la misma linea, como el tag <title/> del ejemplo anterior
 (en cuyo caso el formato es <, nombre del tag, / y >, y NO aparece el nombre nuevamente).
 
 Se pide implementar una funcion html_verifier() que reciba un string que representa un archivo .html y devuelva
@@ -47,6 +47,11 @@ tags de cierre, que esten desbalanceados, etc).
 - Se garantiza que los nombres de los tags tienen como maximo 20 caracteres.
 - Se pueden utilizar funciones de la biblioteca string.h y stdlib.h.
 - No reservar memoria dinamica a menos que sea necesario.
+- Usar una funcion recursiva que reciba como maximo 2 parametros.
+
+[OPCINAL] Consideraciones extra:
+- La funcion recursiva recibe solamente 1 parametro. [AUMENTA MUCHO LA DIFICULTAD]
+- No usar memoria dinamica.
 
 Tips:
 - Buscar el tag de solo cierre y empezar a validar desde ahi.
@@ -82,57 +87,76 @@ Ejemplos:
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 #define REACHED_END 1
 #define INVALID 0
 #define MAX_TAG_NAME_LEN 20
 
-static char html_verifier_rec(char **html) {
-    if (html[0] == '\0') {
-        return REACHED_END;
+static char html_verifier_rec(char **html)
+{
+    if (**html == '\0')
+    {
+        return INVALID; // nunca se llego al tag de solo cierre
     }
 
-    // salteo el caracter <
-    (*html)++;
+    (*html)++; // salteo el caracter <
 
     // guardo el inicio del tag donde estoy parado
     char *tag_start = *html;
 
     // itero contando el largo del tag entre < y >
+    char tag_name[MAX_TAG_NAME_LEN + 1] = {0};
     unsigned int tag_len = 0;
     char is_end_tag = 0;
-    while (tag_start[tag_len] != '>') {
-        if (tag_start[tag_len] == '/') {
+    while (tag_start[tag_len] != '>')
+    {
+        if (tag_start[tag_len] == '/') // es un tag de cierre
+        {
             is_end_tag = 1;
+        }
+        else
+        {
+            tag_name[tag_len] = tag_start[tag_len]; // guardo el nombre del tag caracter a caracter
         }
         tag_len++;
     }
+
+    tag_len -= is_end_tag; // porque si es un tag de cierre, no cuento el / en el largo del tag
+
     // mueve el puntero al final del tag asi continua iterando (recordar que hay que saltear el >)
     *html += tag_len + 1;
+    *html += is_end_tag; // si es un tag de cierre, salteo el / tambien
 
     // si es un tag de cierre, llegue al tag del medio
-    if (is_end_tag) {
+    if (is_end_tag)
+    {
         return REACHED_END;
     }
-
-    // guardo el nombre del tag
-    char tag_name[MAX_TAG_NAME_LEN + 1] = {0};
-    strncpy(tag_name, tag_start, tag_len);
 
     // si no es un tag de cierre, busco el tag de cierre
     int value = html_verifier_rec(html);
 
     // si es invalido o llegue al final de la recursion, ni me gasto en seguir
-    if (value == INVALID || **html == '\0') {
+    if (value == INVALID || **html == '\0')
+    {
         return INVALID;
     }
 
-    // ver si el tag de cierre es el correcto -> OJO! puede que sea mas corto que el tag de apertura y pisar memoria invalida
-    // una opcion mas precisa seria comparar caracter a caracter hasta llegar al > de alguno de los dos
     *html += 2; // salteo </
-    if (strncmp(*html, tag_name, tag_len) != 0) {
-        return INVALID;
+
+    // ver si el tag de cierre es el correcto
+    char *closing_tag_start = *html;
+    char closing_tag_name[MAX_TAG_NAME_LEN + 1] = {0};
+    unsigned int closing_tag_len = 0;
+    while (*closing_tag_start != '>')
+    {
+        closing_tag_name[closing_tag_len++] = *closing_tag_start; // guardamos el nombre del tag de cierre caracter a caracter
+        closing_tag_start++;
+    }
+
+    if (tag_len != closing_tag_len || strncmp(tag_name, closing_tag_name, tag_len) != 0)
+    {
+        return INVALID; // el tag de cierre no coincide con el de apertura
     }
 
     // salteo el tag + >, asi queda apuntando al siguiente tag para el llamado previo
@@ -141,18 +165,13 @@ static char html_verifier_rec(char **html) {
     return value;
 }
 
-char html_verifier(const char *html) {
-    char *html_copy = calloc(strlen(html) + 1, sizeof(char));
-    strcpy(html_copy, html);
-
-    char value = html_verifier_rec(&html_copy);
-
-    free(html_copy);
-
-    return value;
+char html_verifier(const char *html)
+{
+    return html_verifier_rec((char **)&html);
 }
 
-int main() {
+int main()
+{
     printf("%d\n", html_verifier("<html><head><title/></head></html>"));
     printf("%d\n", html_verifier("<html><head><title/></head>"));
     printf("%d\n", html_verifier("<html><body></html>"));
