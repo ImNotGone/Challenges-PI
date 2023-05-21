@@ -88,96 +88,23 @@ Ejemplos:
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #define REACHED_END 1
 #define INVALID 0
 #define MAX_TAG_NAME_LEN 20
 
-static char html_verifier_rec(char **html)
-{
-    if (**html == '\0')
-    {
-        return INVALID; // nunca se llego al tag de solo cierre
-    }
-
-    (*html)++; // salteo el caracter <
-
-    // guardo el inicio del tag donde estoy parado
-    char *tag_start = *html;
-
-    // itero contando el largo del tag entre < y >
-    char tag_name[MAX_TAG_NAME_LEN + 1] = {0};
-    unsigned int tag_len = 0;
-    char is_end_tag = 0;
-    while (tag_start[tag_len] != '>')
-    {
-        if (tag_start[tag_len] == '/') // es un tag de cierre
-        {
-            is_end_tag = 1;
-        }
-        else
-        {
-            tag_name[tag_len] = tag_start[tag_len]; // guardo el nombre del tag caracter a caracter
-        }
-        tag_len++;
-    }
-
-    tag_len -= is_end_tag; // porque si es un tag de cierre, no cuento el / en el largo del tag
-
-    // mueve el puntero al final del tag asi continua iterando (recordar que hay que saltear el >)
-    *html += tag_len + 1;
-    *html += is_end_tag; // si es un tag de cierre, salteo el / tambien
-
-    // si es un tag de cierre, llegue al tag del medio
-    if (is_end_tag)
-    {
-        return REACHED_END;
-    }
-
-    // si no es un tag de cierre, busco el tag de cierre
-    int value = html_verifier_rec(html);
-
-    // si es invalido o llegue al final de la recursion, ni me gasto en seguir
-    if (value == INVALID || **html == '\0')
-    {
-        return INVALID;
-    }
-
-    *html += 2; // salteo </
-
-    // ver si el tag de cierre es el correcto
-    char *closing_tag_start = *html;
-    char closing_tag_name[MAX_TAG_NAME_LEN + 1] = {0};
-    unsigned int closing_tag_len = 0;
-    while (*closing_tag_start != '>')
-    {
-        closing_tag_name[closing_tag_len++] = *closing_tag_start; // guardamos el nombre del tag de cierre caracter a caracter
-        closing_tag_start++;
-    }
-
-    if (tag_len != closing_tag_len || strncmp(tag_name, closing_tag_name, tag_len) != 0)
-    {
-        return INVALID; // el tag de cierre no coincide con el de apertura
-    }
-
-    // salteo el tag + >, asi queda apuntando al siguiente tag para el llamado previo
-    *html += tag_len + 1;
-
-    return value;
-}
-
-char html_verifier(const char *html)
-{
-    return html_verifier_rec((char **)&html);
-}
+char html_verifier(const char *html);
 
 int main()
 {
-    printf("%d\n", html_verifier("<html><head><title/></head></html>"));
-    printf("%d\n", html_verifier("<html><head><title/></head>"));
-    printf("%d\n", html_verifier("<html><body></html>"));
-    printf("%d\n", html_verifier("<html><body><p>"));
-    printf("%d\n", html_verifier("<html><body/><p>"));
-    printf("%d\n", html_verifier("<html><body><p><title/></p></body></html>"));
+    assert(1 == html_verifier("<html><head><title/></head></html>"));
+    assert(0 == html_verifier("<html><head><title/></head>"));
+    assert(0 == html_verifier("<html><body></html>"));
+    assert(0 == html_verifier("<html><body><p>"));
+    assert(0 == html_verifier("<html><body/><p>"));
+    assert(1 == html_verifier("<html><body><p><title/></p></body></html>"));
+
+    puts("OK!");
     return 0;
 }
