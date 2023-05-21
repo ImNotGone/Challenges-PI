@@ -46,6 +46,7 @@ es decir, solamente se incluyen tags pero NO se garantiza que el archivo sea val
 tags de cierre, que esten desbalanceados, etc).
 - Se garantiza que los nombres de los tags tienen como maximo 20 caracteres.
 - Se pueden utilizar funciones de la biblioteca string.h y stdlib.h.
+- Se pueden utilizar funciones auxiliares.
 - No reservar memoria dinamica a menos que sea necesario.
 - Usar una funcion recursiva que reciba como maximo 2 parametros.
 

@@ -1,4 +1,8 @@
 /*
+#################################################
+    NIVEL DE DIFICULTAD: 5/10 - Podria ser un ejercicio de parcial
+#################################################
+
 Una montaña de numeros consiste en dado un numero n, imprimir todos los numeros de manera escalonada
 ascendente hasta n y luego descendente hasta 1. Por ejemplo, si n = 5, la montaña de numeros es:
 1 2 3 4 5 4 3 2 1
