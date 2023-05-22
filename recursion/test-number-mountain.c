@@ -1,6 +1,6 @@
 /*
 #################################################
-    NIVEL DE DIFICULTAD: 5/10 - Podria ser un ejercicio de parcial
+    NIVEL DE DIFICULTAD: 5/10 - Podria ser un ejercicio de parcial [VERIFICADO]
 #################################################
 
 Una montaña de numeros consiste en dado un numero n, imprimir todos los numeros de manera escalonada
