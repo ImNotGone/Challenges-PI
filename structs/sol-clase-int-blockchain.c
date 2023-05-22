@@ -115,12 +115,86 @@ typedef struct
 
 void free_blockchain(S_Blockchain *blockchain)
 {
-    // TODO: implementar
+    for(int i = 0; i < blockchain->size; i++) {
+        for(int j = 0; j < blockchain->blocks[i].size; j++) {
+            free(blockchain->blocks[i].transactions[j].sender);
+            free(blockchain->blocks[i].transactions[j].receiver);
+        }
+        free(blockchain->blocks[i].transactions);
+    }
+    free(blockchain->blocks);
+    free(blockchain);
+    return;
+}
+
+static void insert_into_blocks(S_Blockchain * blockchain, const int current_transaction_amount, int id, const char * sender, const char * reciever) {
+    S_Transaction * current_transaction_aux = &blockchain->blocks[blockchain->size - 1].transactions[blockchain->blocks[blockchain->size -1].size];
+    current_transaction_aux->id = id;
+    current_transaction_aux->amount = current_transaction_amount;
+    current_transaction_aux->sender = malloc((strlen(sender) + 1) * sizeof(char));
+    strcpy(current_transaction_aux->sender, sender);
+    current_transaction_aux->receiver = malloc((strlen(reciever) + 1) * sizeof(char));
+    strcpy(current_transaction_aux->receiver, reciever);
+
+
+    blockchain->blocks[blockchain->size - 1].amount += current_transaction_amount;
+    blockchain->blocks[blockchain->size - 1].size++;
+}
+
+static void resize_blocks(S_Blockchain * blockchain) {
+    if(blockchain->size % BLOCK_SIZE == 0) {
+        blockchain->blocks = realloc(blockchain->blocks, (blockchain->size + BLOCK_SIZE) * sizeof(S_Block));
+    }
+
+    blockchain->blocks[blockchain->size].size = 0;
+    blockchain->blocks[blockchain->size].amount = 0;
+    blockchain->blocks[blockchain->size].transactions = malloc(blockchain->transactions_per_block * sizeof(S_Transaction));
+    blockchain->size++;
+}
+
+static int need_more_blocks(S_Blockchain * blockchain) {
+    return blockchain->blocks[blockchain->size - 1].size == blockchain->transactions_per_block;
 }
 
 S_Blockchain *create_blockchain(const char **senders, const char **receivers, const int *amounts, unsigned int transactions, unsigned int transactions_per_block, unsigned int max_transaction_amount)
 {
-    // TODO: implementar
+    S_Blockchain * blockchain = malloc(sizeof(S_Blockchain));
+
+    blockchain->transactions_per_block = transactions_per_block;
+    blockchain->max_transaction_amount = max_transaction_amount;
+    blockchain->blocks = NULL;
+    blockchain->size = 0;
+
+    for(int i = 0; i < transactions; i++) {
+        if(blockchain->size == 0 || need_more_blocks(blockchain)) {
+            resize_blocks(blockchain);
+        }
+        if(amounts[i] >= 0) {
+            int remaining_amount = amounts[i];
+            do {
+                int current_transaction_amount = max_transaction_amount > remaining_amount ? remaining_amount: max_transaction_amount;
+
+                insert_into_blocks(blockchain, current_transaction_amount, i, senders[i], receivers[i]);
+
+                remaining_amount -= current_transaction_amount;
+                if(remaining_amount > 0  && need_more_blocks(blockchain)) {
+                    resize_blocks(blockchain);
+                }
+            } while(remaining_amount > 0);
+        }
+    }
+
+    if(blockchain->blocks[blockchain->size - 1].size == 0) {
+        free(blockchain->blocks[blockchain->size - 1].transactions);
+        blockchain->size--;
+    }
+
+    if(blockchain->blocks[blockchain->size - 1].size != blockchain->transactions_per_block) {
+        blockchain->blocks[blockchain->size -1].transactions = realloc(blockchain->blocks[blockchain->size -1].transactions, blockchain->blocks[blockchain->size - 1].size * sizeof(S_Transaction));
+    }
+
+    blockchain->blocks = realloc(blockchain->blocks, (blockchain->size) * sizeof(S_Block));
+    return blockchain;
 }
 
 int main()
