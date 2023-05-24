@@ -12,7 +12,7 @@ la montaña de numeros en un puntero. Ademas, se debe imprimir por pantalla la m
 a medida que se va armando.
 
 La montaña no puede estar formada por mas de 100 numeros y debe contener todos numeros positivos
-(el 0 no cuenta). 
+(el 0 no cuenta).
 
 En caso que no se pueda armar la montaña de numeros, la funcion debe devolver NULL y no imprimir nada.
 
@@ -55,48 +55,49 @@ Ejemplos:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
-static void number_mountain_rec(unsigned int n, unsigned int *mountain, unsigned int iteration)
-{
-    // guardo el numero de la iteracion en la posicion de la iteracion correspondiente
-    mountain[iteration - 1] = iteration;
-    printf("%d ", iteration);
-    // si llegue al tope de la montaña, finalizo la recursion
-    if (n == iteration) return;
-
-    // me muevo a la siguiente iteracion
-    number_mountain_rec(n, mountain, iteration + 1);
-
-    // ESTO YA ES LA VUELTA -> recursion de tipo cola (FIFO)
-    // 2 * n - 1 me deja una posicion a la derecha del ultimo elemento, y le resto la iteracion que NO es un indice
-    mountain[2 * n - 1 - iteration] = iteration; // alternativa con indices: mountain[(2 * n - 1) - 1 - (iteration - 1)] = iteration;
-    printf("%d ", iteration);
-}
-
-unsigned int *number_mountain(int n)
-{
-    if (n < 1 || (2 * n - 1) > 100)
-    {
-        return NULL;
-    }
-    unsigned int *mountain = malloc((2 * n - 1) * sizeof(unsigned int));
-
-    number_mountain_rec(n, mountain, 1);
-    printf("\n");
-    return mountain;
-}
+unsigned int *number_mountain(int n);
 
 int main()
 {
-    int n = -1;
+    int n = 5;
     unsigned int *mountain = number_mountain(n);
-
+    assert(mountain != NULL);
+    unsigned int expected_5[] = {1, 2, 3, 4, 5, 4, 3, 2, 1};
+    unsigned int *expected_ptr = expected_5;
     for (int i = 0; i < (2 * n - 1); i++)
     {
-        printf("%d ", mountain[i]);
+        assert(expected_ptr[i] == mountain[i]);
     }
 
-    printf("\n");
-    free(mountain);
+    n = 1;
+    mountain = number_mountain(n);
+    assert(mountain != NULL);
+    unsigned int expected_1[] = {1};
+    expected_ptr = expected_1;
+    for (int i = 0; i < (2 * n - 1); i++)
+    {
+        assert(expected_ptr[i] == mountain[i]);
+    }
+
+    n = 0;
+    mountain = number_mountain(n);
+    assert(mountain == NULL);
+
+    n = 100;
+    mountain = number_mountain(n);
+    assert(mountain == NULL);
+
+    n = 63;
+    mountain = number_mountain(n);
+    assert(mountain == NULL);
+
+    n = -5;
+    mountain = number_mountain(n);
+    assert(mountain == NULL);
+
+    // EL PROGRAMA NO DEBE TENER LEAKS DE MEMORIA
+    printf("OK!");
     return 0;
 }
