@@ -39,6 +39,9 @@ Partiendo de una lista 5 -> 4 -> 3 -> 2 -> 1 -> NULL
 
 - Input: n = 6
   Output: 1 -> 5 -> 4 -> 3 -> 2 -> NULL
+
+- Input: n = 2 y usando como lista la rotada del ejemplo n = 2
+  Output: 4 -> 3 -> 2 -> 1 -> 5 -> NULL (es equivalente a usar la lista original con n = 4)
 */
 
 #include <stdio.h>
@@ -152,5 +155,35 @@ int main()
     print_rotation(4); // 4 -> 3 -> 2 -> 1 -> 5
     print_rotation(5); // no deberia rotar
     print_rotation(6); // 1 -> 5 -> 4 -> 3 -> 2
+
+    TNode n1 = {1, NULL};
+    TNode n2 = {2, &n1};
+    TNode n3 = {3, &n2};
+    TNode n4 = {4, &n3};
+    TNode n5 = {5, &n4};
+
+    TList list = &n5;
+
+    TList rotated = rotate_list(list, 2);
+    TList rotated_copy = rotated;
+
+    while (rotated != NULL)
+    {
+        printf("%d\n", rotated->elem);
+        rotated = rotated->tail;
+    }
+
+    puts("#####################");
+
+    rotated = rotate_list(rotated_copy, 2);
+
+    while (rotated != NULL)
+    {
+        printf("%d\n", rotated->elem);
+        rotated = rotated->tail;
+    }
+
+    puts("#####################");
+
     return 0;
 }
