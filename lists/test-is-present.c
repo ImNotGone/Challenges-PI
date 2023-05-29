@@ -4,7 +4,7 @@ y devuelva 1 si el valor se encuentra en la lista y 0 en caso contrario.
 
 Usar la siguiente definicion de lista:
 
-typedef​ struct node * TList; 
+typedef​ struct node * TList;
 
 typedef​ struct node {
   int elem;
@@ -13,6 +13,7 @@ typedef​ struct node {
 */
 
 #include <stdio.h>
+#include <assert.h>
 
 typedef struct node * TList;
 
@@ -21,17 +22,7 @@ typedef struct node {
   struct node * tail;
 } TNode;
 
-char is_present(TList list, int value) {
-  if (list == NULL) {
-    return 0;
-  }
-
-  if (list->elem == value) {
-    return 1;
-  }
-
-  return is_present(list->tail, value);
-}
+char is_present(TList list, int value);
 
 int main(void) {
   TNode n1 = {1, NULL};
@@ -42,12 +33,17 @@ int main(void) {
 
   TList list = &n5;
 
-  printf("%d\n", is_present(list, 1));
-  printf("%d\n", is_present(list, 2));
-  printf("%d\n", is_present(list, 3));
-  printf("%d\n", is_present(list, 4));
-  printf("%d\n", is_present(list, 5));
-  printf("%d\n", is_present(list, 6));
+  assert(1 == is_present(list, 1));
+  assert(1 == is_present(list, 2));
+  assert(1 == is_present(list, 3));
+  assert(1 == is_present(list, 4));
+  assert(1 == is_present(list, 5));
+  assert(0 == is_present(list, 6));
 
+  puts("OK!");
   return 0;
+}
+
+char is_present(TList list, int value) {
+    return 0;
 }
