@@ -32,6 +32,12 @@ Partiendo de una lista 5 -> 4 -> 3 -> 2 -> 1 -> NULL
 
 - Input: start = 7, end = 11
   Output: NULL
+  
+- Input: start = -2, end = -4
+  Output: NULL
+
+- Input: start = -1, end = 2
+  Output: NULL
 */
 
 #include <stdio.h>
