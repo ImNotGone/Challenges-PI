@@ -3,7 +3,7 @@ Escribir una funcion recursiva llamada sublist() que reciba una lista y dos valo
 enteros indicando el inicio y el fin de la sublista a devolver (comenzando desde 0).
 La funcion debe devolver una nueva lista con los elementos de la sublista.
 
-Si el inicio es mayor o igual al fin, la funcion debe devolver NULL.
+Si el inicio es mayor al fin, la funcion debe devolver NULL.
 Si el fin es mayor a la longitud de la lista, la funcion debe devolver hasta el ultimo elemento.
 
 Usar la siguiente definicion de lista:
