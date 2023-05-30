@@ -36,6 +36,7 @@ Partiendo de una lista 5 -> 4 -> 3 -> 2 -> 1 -> NULL
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 typedef struct node *TList;
 
@@ -45,10 +46,11 @@ typedef struct node
     struct node *tail;
 } TNode;
 
-TList sublist(TList list, unsigned int start, unsigned int end)
+TList sublist(TList list, int start, int end)
 {
     // si la lista es nula o el inicio es mayor o igual al fin, devolver NULL
-    if (list == NULL || start > end)
+    // o si end o start son negativos, devolver NULL
+    if (list == NULL || start > end || start < 0 || end < 0)
     {
         return NULL;
     }
@@ -66,6 +68,13 @@ TList sublist(TList list, unsigned int start, unsigned int end)
     return sublist(list->tail, start - 1, end - 1);
 }
 
+static void freeList(TList first) {
+    if(first == NULL) return;
+    freeList(first->tail);
+    free(first);
+    return;
+}
+
 int main(void)
 {
     TNode n1 = {1, NULL};
@@ -76,54 +85,79 @@ int main(void)
 
     TList list = &n5;
 
-    // TODO: LIBERAR MEMORIA
     TList result = sublist(list, 1, 3);
+    TList result_aux = result;
+
+    TNode n1_aux1 = {2, NULL};
+    TNode n2_aux1 = {3, &n1_aux1};
+    TNode n3_aux1 = {4, &n2_aux1};
+
+    TList expected_1 = &n3_aux1;
 
     while (result != NULL)
     {
-        printf("%d\n", result->elem);
+        assert(expected_1->elem == result->elem);
         result = result->tail;
+        expected_1 = expected_1->tail;
     }
 
-    puts("#####################");
+    assert(expected_1 == NULL);
 
+    freeList(result_aux);
     result = sublist(list, 0, 0);
+    result_aux = result;
+
+    TNode n1_aux2 = {5, NULL};
+
+    TList expected_2 = &n1_aux2;
 
     while (result != NULL)
     {
-        printf("%d\n", result->elem);
+        assert(expected_2->elem == result->elem);
         result = result->tail;
+        expected_2 = expected_2->tail;
     }
 
-    puts("#####################");
+    assert(expected_2 == NULL);
 
+    freeList(result_aux);
     result = sublist(list, 0, 10);
+    result_aux = result;
+
+    TNode n1_aux3 = {1, NULL};
+    TNode n2_aux3 = {2, &n1_aux3};
+    TNode n3_aux3 = {3, &n2_aux3};
+    TNode n4_aux3 = {4, &n3_aux3};
+    TNode n5_aux3 = {5, &n4_aux3};
+
+    TList expected_3 = &n5_aux3;
 
     while (result != NULL)
     {
-        printf("%d\n", result->elem);
+        assert(expected_3->elem == result->elem);
         result = result->tail;
+        expected_3 = expected_3->tail;
     }
 
-    puts("#####################");
+    assert(expected_3 == NULL);
 
+    freeList(result_aux);
     result = sublist(list, 10, 0);
 
-    while (result != NULL)
-    {
-        printf("%d\n", result->elem);
-        result = result->tail;
-    }
-
-    puts("#####################");
+    assert(result == NULL);
 
     result = sublist(list, 7, 11);
 
-    while (result != NULL)
-    {
-        printf("%d\n", result->elem);
-        result = result->tail;
-    }
+    assert(result == NULL);
 
+    result = sublist(list, -2, -4);
+
+    assert(result == NULL);
+
+    result = sublist(list, -1, 2);
+
+    assert(result == NULL);
+
+    puts("OK!");
     return 0;
 }
