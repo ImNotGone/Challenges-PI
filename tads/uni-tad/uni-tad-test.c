@@ -40,6 +40,9 @@ int main() {
 
     assert(university_student_count(uni) == 0);
     assert(university_students(uni) == NULL);
+    assert(university_remove_student(uni, student1) == false);
+    assert(university_student_count(uni) == 0);
+    assert(university_students(uni) == NULL);
 
     student * students;
     for (int i = 0; i < 6;) {
@@ -181,6 +184,66 @@ int main() {
 
     assert(university_course_remove_student(uni, course4, student3) == false);
 
+    assert(university_remove_student(uni, student2) == true);
+    assert(university_course_add_student(uni, course1, student2) == false);
+    assert(university_course_add_student(uni, course2, student2) == false);
+    assert(university_course_add_student(uni, course3, student2) == false);
+    assert(university_student_count(uni) == 5);
+
+    student_count = university_course_student_count(uni, course1);
+    assert(student_count == 2);
+    students = university_course_students(uni, course1);
+    for (int i = 0; i < student_count; i++) {
+        assert(student_cmp(students_expected[i*2], students[i]) == 0);
+    }
+    free(students);
+
+    student_count = university_course_student_count(uni, course2);
+    assert(student_count == 1);
+    students = university_course_students(uni, course2);
+    assert(student_cmp(student6, students[0]) == 0);
+    free(students);
+
+    student students_expected_3 [] = {
+        student1,
+        student5,
+        student6,
+    };
+
+    students_expected = students_expected_3;
+
+    student_count = university_course_student_count(uni, course3);
+    assert(student_count == 3);
+    students = university_course_students(uni, course3);
+    for (int i = 0; i < student_count; i++) {
+        assert(student_cmp(students_expected[i], students[i]) == 0);
+    }
+    free(students);
+
+    assert(university_add_or_update_student(uni, student2) == true);
+    assert(university_course_add_student(uni, course3, student3) == true);
+    assert(university_course_add_student(uni, course3, student4) == true);
+    assert(university_course_add_student(uni, course3, student2) == false);
+
+    student students_expected_4 [] = {
+        student1,
+        student5,
+        student6,
+        student3,
+        student4,
+    };
+
+    students_expected = students_expected_4;
+
+    student_count = university_course_student_count(uni, course3);
+    assert(student_count == 5);
+    students = university_course_students(uni, course3);
+    for (int i = 0; i < student_count; i++) {
+        assert(student_cmp(students_expected[i], students[i]) == 0);
+    }
+    free(students);
+
     university_free(uni);
+    puts("OK!");
     return 0;
 }

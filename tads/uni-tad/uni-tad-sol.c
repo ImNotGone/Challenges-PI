@@ -36,6 +36,21 @@ typedef struct universityCDT {
 
 #define MEM_BLOCK 5
 
+
+static student_list add_student_rec(student_list first, student student, student_comparator_fun comparator, bool * added, bool * updated);
+
+static student_list delete_student_rec(student_list first, student student, student_comparator_fun comparator, bool * deleted);
+
+static student_list find_student_rec(student_list first, student student, student_comparator_fun comparator);
+
+static student_list find_prev_student_rec(student_list first, student student, student_comparator_fun comparator);
+
+static course_info * find_course(universityADT uni, course course);
+
+static bool aux_course_remove_student(universityADT uni, course_info * course_info, student student);
+
+static void freeList(student_list first);
+
 // Reserva memoria para una nueva universidad
 universityADT university_create(struct university_configuration * conf) {
     if(conf == NULL) {
@@ -58,7 +73,7 @@ universityADT university_create(struct university_configuration * conf) {
     return new_uni;
 }
 
-student_list add_student_rec(student_list first, student student, student_comparator_fun comparator, bool * added, bool * updated) {
+static student_list add_student_rec(student_list first, student student, student_comparator_fun comparator, bool * added, bool * updated) {
 
     int c;
 
@@ -95,6 +110,28 @@ bool university_add_or_update_student(universityADT uni, struct student student)
     return added || updated;
 }
 
+
+bool university_remove_student(universityADT uni, struct student student) {
+
+    // me guardo el anterior para hacer un delete "eficiente"
+    student_list student_aux = find_prev_student_rec(uni->students, student, uni->conf->student_comparator);
+
+    if(student_aux == NULL) {
+        return false;
+    }
+
+    for (int i = 0; i < uni->course_count; i++) {
+        aux_course_remove_student(uni, &uni->courses[i], student);
+    }
+
+    student_list aux = student_aux->tail;
+    student_aux->tail = aux->tail;
+    uni->student_count--;
+    free(aux);
+
+    return true;
+}
+
 bool university_add_course(universityADT uni, struct course course) {
     if(uni->course_count == uni->conf->max_courses) {
         return false;
@@ -111,30 +148,6 @@ bool university_add_course(universityADT uni, struct course course) {
     uni->courses[uni->course_count].student_count = 0;
     uni->course_count++;
     return true;
-}
-
-
-static student_list find_student_rec(student_list first, student student, student_comparator_fun comparator) {
-    int c;
-
-    if(first == NULL || (c = comparator(first->student, student)) > 0) {
-        return NULL;
-    }
-
-    if(c == 0) {
-        return first;
-    }
-
-    return find_student_rec(first->tail, student, comparator);
-}
-
-static course_info * find_course(universityADT uni, course course) {
-    for(unsigned i = 0; i < uni->course_count; i++) {
-        if(uni->conf->course_comparator(uni->courses[i].course, course) == 0) {
-            return &uni->courses[i];
-        }
-    }
-    return NULL;
 }
 
 bool university_course_add_student(universityADT uni, struct course course, struct student student) {
@@ -167,24 +180,7 @@ bool university_course_add_student(universityADT uni, struct course course, stru
 
 bool university_course_remove_student(universityADT uni, struct course course, struct student student) {
     course_info * course_aux = find_course(uni, course);
-
-    if(course_aux == NULL) {
-        return false;
-    }
-
-    bool found = false;
-    int i;
-    for (i = 0; i < course_aux->student_count && !found; i++) {
-        found = uni->conf->student_comparator(*course_aux->students[i], student) == 0;
-        if (found) {
-            for (int j = i; j < course_aux->student_count - 1; j++) {
-            course_aux->students[j] = course_aux->students[j+1];
-            }
-            course_aux->student_count--;
-        }
-    }
-
-    return found;
+    return aux_course_remove_student(uni, course_aux, student);
 }
 
 struct student * university_course_students(universityADT uni, struct course course) {
@@ -224,12 +220,6 @@ unsigned university_course_student_count(universityADT uni, struct course course
     return course_aux->student_count;
 }
 
-static void freeList(student_list first) {
-    if(first == NULL) return;
-    freeList(first->tail);
-    free(first);
-}
-
 void university_free(universityADT uni) {
 
     freeList(uni->students);
@@ -242,3 +232,65 @@ void university_free(universityADT uni) {
     free(uni);
 }
 
+static student_list find_student_rec(student_list first, student student, student_comparator_fun comparator) {
+    int c;
+
+    if(first == NULL || (c = comparator(first->student, student)) > 0) {
+        return NULL;
+    }
+
+    if(c == 0) {
+        return first;
+    }
+
+    return find_student_rec(first->tail, student, comparator);
+}
+
+static student_list find_prev_student_rec(student_list first, student student, student_comparator_fun comparator) {
+    int c;
+
+    if(first == NULL || first->tail == NULL || (c = comparator(first->tail->student, student)) > 0) {
+        return NULL;
+    }
+
+    if(c == 0) {
+        return first;
+    }
+
+    return find_student_rec(first->tail, student, comparator);
+}
+
+static course_info * find_course(universityADT uni, course course) {
+    for(unsigned i = 0; i < uni->course_count; i++) {
+        if(uni->conf->course_comparator(uni->courses[i].course, course) == 0) {
+            return &uni->courses[i];
+        }
+    }
+    return NULL;
+}
+
+static bool aux_course_remove_student(universityADT uni, course_info * course_info, student student) {
+    if(course_info == NULL) {
+        return false;
+    }
+
+    bool found = false;
+    int i;
+    for (i = 0; i < course_info->student_count && !found; i++) {
+        found = uni->conf->student_comparator(*course_info->students[i], student) == 0;
+        if (found) {
+            for (int j = i; j < course_info->student_count - 1; j++) {
+                course_info->students[j] = course_info->students[j+1];
+            }
+            course_info->student_count--;
+        }
+    }
+
+    return found;
+}
+
+static void freeList(student_list first) {
+    if(first == NULL) return;
+    freeList(first->tail);
+    free(first);
+}

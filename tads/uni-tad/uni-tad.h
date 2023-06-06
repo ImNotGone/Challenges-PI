@@ -38,6 +38,10 @@ universityADT university_create(struct university_configuration * conf);
 // retorna true, si lo pudo agregar o lo actualizo
 bool university_add_or_update_student(universityADT uni, struct student student);
 
+// borra un estudiante de la universidad
+// retorna true si lo borro, false sino
+bool university_remove_student(universityADT uni, struct student student);
+
 // agrega un curso a la universidad si el maximo de cursos no se alcanzo
 // retorna true o false dependiendo si agrego o no el curso
 bool university_add_course(universityADT uni, struct course course);
