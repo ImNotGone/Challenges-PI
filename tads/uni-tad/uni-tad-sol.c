@@ -34,6 +34,8 @@ typedef struct universityCDT {
 
 } universityCDT;
 
+#define MEM_BLOCK 5
+
 // Reserva memoria para una nueva universidad
 universityADT university_create(struct university_configuration * conf) {
     if(conf == NULL) {
@@ -56,7 +58,7 @@ universityADT university_create(struct university_configuration * conf) {
     return new_uni;
 }
 
-student_list add_student_rec(student_list first, student student, student_comparator_fun comparator, bool * added) {
+student_list add_student_rec(student_list first, student student, student_comparator_fun comparator, bool * added, bool * updated) {
 
     int c;
 
@@ -74,25 +76,25 @@ student_list add_student_rec(student_list first, student student, student_compar
 
     // es igual (porahi es un update -> piso el q tenia)
     if(c == 0) {
-        *added = true;
+        *updated = true;
         first->student = student;
         return first;
     }
 
-    first->tail = add_student_rec(first->tail, student, comparator, added);
+    first->tail = add_student_rec(first->tail, student, comparator, added, updated);
     return first;
 }
 
-bool university_add_student(universityADT uni, struct student student) {
+bool university_add_or_update_student(universityADT uni, struct student student) {
     bool added = false;
-    uni->students = add_student_rec(uni->students, student, uni->conf->student_comparator, &added);
+    bool updated = false;
+    uni->students = add_student_rec(uni->students, student, uni->conf->student_comparator, &added, &updated);
     if(added) {
         uni->student_count++;
     }
-    return added;
+    return added || updated;
 }
 
-#define MEM_BLOCK 5
 bool university_add_course(universityADT uni, struct course course) {
     if(uni->course_count == uni->conf->max_courses) {
         return false;
@@ -115,7 +117,7 @@ bool university_add_course(universityADT uni, struct course course) {
 static student_list find_student_rec(student_list first, student student, student_comparator_fun comparator) {
     int c;
 
-    if(first->tail == NULL || (c = comparator(first->student, student)) > 0) {
+    if(first == NULL || (c = comparator(first->student, student)) > 0) {
         return NULL;
     }
 
@@ -147,18 +149,42 @@ bool university_course_add_student(universityADT uni, struct course course, stru
         return false;
     }
 
+    for(int i = 0; i < course_aux->student_count; i++) {
+        if(&student_aux->student == course_aux->students[i]) {
+            return false;
+        }
+    }
+
     if(course_aux->student_count % MEM_BLOCK == 0) {
         course_aux->students = realloc(course_aux->students, sizeof(struct student *) * (course_aux->student_count + MEM_BLOCK));
     }
 
-    course_aux->students[course_aux->student_count] = &student_aux->student;
+    course_aux->students[course_aux->student_count++] = &student_aux->student;
 
     return true;
 
 }
 
 bool university_course_remove_student(universityADT uni, struct course course, struct student student) {
-    assert(0 && "Unimplemented");
+    course_info * course_aux = find_course(uni, course);
+
+    if(course_aux == NULL) {
+        return false;
+    }
+
+    bool found = false;
+    int i;
+    for (i = 0; i < course_aux->student_count && !found; i++) {
+        found = uni->conf->student_comparator(*course_aux->students[i], student) == 0;
+        if (found) {
+            for (int j = i; j < course_aux->student_count - 1; j++) {
+            course_aux->students[j] = course_aux->students[j+1];
+            }
+            course_aux->student_count--;
+        }
+    }
+
+    return found;
 }
 
 struct student * university_course_students(universityADT uni, struct course course) {
@@ -177,6 +203,7 @@ struct student * university_course_students(universityADT uni, struct course cou
 }
 
 struct student * university_students(universityADT uni) {
+    if(uni->student_count == 0) return NULL;
     student_list aux = uni->students;
     student * students = malloc(sizeof(struct student) * uni->student_count);
     for(int i = 0; aux != NULL; i++, aux = aux->tail) {
